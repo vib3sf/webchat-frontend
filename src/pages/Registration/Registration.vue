@@ -2,14 +2,11 @@
   <Wrapper>
     <FormWrapper
       ><Logo />
-      <h1>Login to your account</h1>
+      <h1>Create an account</h1>
       <p>
-        Don't have an account?
-        <router-link
-          to="/registration"
-          style="text-decoration: none; color: #4796ff"
-        >
-          Sign up
+        Already have an account?
+        <router-link to="/login" style="text-decoration: none; color: #4796ff">
+          Sign in
         </router-link>
       </p>
       <div class="inputs">
@@ -20,9 +17,20 @@
           placeholder="Nickname"
           type="text"
         />
-        <PasswordInput v-model="password" width="400px" height="40px" />
+        <div class="small">
+          <Input
+            v-model="email"
+            type="email"
+            placeholder="Email"
+            width="195px"
+            height="40px"
+          />
+          <PasswordInput v-model="password" width="195px" height="40px" />
+        </div>
       </div>
-      <Button :name="name" :password="password"> Sign up </Button></FormWrapper
+      <Button :name="name" :email="email" :password="password">
+        Sign in
+      </Button></FormWrapper
     >
   </Wrapper>
 </template>
@@ -36,7 +44,7 @@ import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
 import Button from "../../components/Button/Button.vue";
 
 export default {
-  name: "Login",
+  name: "Registration",
   components: {
     Wrapper,
     FormWrapper,
@@ -48,6 +56,7 @@ export default {
   data() {
     return {
       name: "",
+      email: "",
       password: "",
     };
   },
@@ -68,10 +77,12 @@ p {
 .inputs {
   max-width: fit-content;
   margin: 0 auto;
-  margin-bottom: 50px;
 
-  input:first-child {
-    margin-bottom: 10px;
+  .small {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 50px;
   }
 }
 </style>

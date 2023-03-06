@@ -23,7 +23,7 @@
 <script>
 export default {
   name: "PasswordInput",
-  props: ["width", "height", "modelValue", "type"],
+  props: ["width", "height", "modelValue"],
   data() {
     return {
       isShowed: false,

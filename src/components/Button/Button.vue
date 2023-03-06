@@ -7,10 +7,10 @@
 <script>
 export default {
   name: "Button",
-  props: ["name", "password"],
+  props: ["name", "password", "email"],
   methods: {
     log() {
-      console.log(this.$props.name, this.$props.password);
+      console.log(this.$props.name, this.$props.password, this.$props.email);
     },
   },
 };
