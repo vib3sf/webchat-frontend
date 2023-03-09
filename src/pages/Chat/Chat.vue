@@ -3,7 +3,13 @@
     ><div class="chat">
       <header class="header">
         <Logo></Logo>
-        <button class="settings">...</button>
+        <button class="settings" @click="handleLogout">
+          <img
+            src="../../../public/res/logout.png"
+            class="logout"
+            alt="logout"
+          />
+        </button>
       </header>
       <div class="content"></div>
       <div class="typingarea">
@@ -18,7 +24,6 @@
             placeholder="Start typing"
           />
         </div>
-        <input type="text" class="attach-button"><img src="../../../public/res/attachment.png" alt="attachment" /></input>
         <button class="send-button">
           <img src="../../../public/res/send.png" alt="send" />
         </button>
@@ -30,12 +35,20 @@
 import Wrapper from "../../components/Wrapper/Wrapper.vue";
 import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
+import { removeSessionFromStorage } from "../../helpers/tokens.js";
+import { removeUserFromStorage } from "../../helpers/user.js";
 export default {
   name: "Chat",
   components: {
     Wrapper,
     Logo,
     Input,
+  },
+  methods: {
+    handleLogout() {
+      removeSessionFromStorage();
+      removeUserFromStorage();
+    },
   },
 };
 </script>
@@ -58,7 +71,7 @@ export default {
     .settings
       position: absolute
       left: 950px
-      top: 5px
+      top: 17px
       background-color: #ffffff
       outline: none
       border: none
@@ -93,18 +106,6 @@ export default {
     .inp
         width: 100%
         margin-top: 19.3px
-
-    .attach-button
-      background-color: #ffffff
-      width: fit-content
-      height: fit-content
-      margin: 0 10px
-      border: none
-
-      img
-        width: 24px
-        cursor: pointer
-        margin-top: 27.3px
 
     .send-button
       background-color: #ffffff

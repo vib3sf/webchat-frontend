@@ -28,9 +28,7 @@
           <PasswordInput v-model="password" width="195px" height="40px" />
         </div>
       </div>
-      <Button :name="name" :email="email" :password="password">
-        Sign in
-      </Button></FormWrapper
+      <Button @click="handleRegister"> Sign in </Button></FormWrapper
     >
   </Wrapper>
 </template>
@@ -42,6 +40,7 @@ import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
 import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
 import Button from "../../components/Button/Button.vue";
+import { register } from "../../api/user.js";
 
 export default {
   name: "Registration",
@@ -59,6 +58,18 @@ export default {
       email: "",
       password: "",
     };
+  },
+  methods: {
+    async handleRegister() {
+      try {
+        await register(this.name, this.email, this.password);
+        this.name = "";
+        this.email = "";
+        this.password = "";
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };
 </script>

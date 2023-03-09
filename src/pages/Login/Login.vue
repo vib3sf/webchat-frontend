@@ -22,7 +22,7 @@
         />
         <PasswordInput v-model="password" width="400px" height="40px" />
       </div>
-      <Button :name="name" :password="password"> Sign up </Button></FormWrapper
+      <Button @click="handleLogin"> Sign up </Button></FormWrapper
     >
   </Wrapper>
 </template>
@@ -34,6 +34,7 @@ import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
 import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
 import Button from "../../components/Button/Button.vue";
+import { login } from "../../api/user.js";
 
 export default {
   name: "Login",
@@ -50,6 +51,17 @@ export default {
       name: "",
       password: "",
     };
+  },
+  methods: {
+    async handleLogin() {
+      try {
+        await login(this.name, this.password);
+        this.name = "";
+        this.password = "";
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };
 </script>
