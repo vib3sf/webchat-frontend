@@ -63,26 +63,24 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-h1 {
-  text-align: center;
-  margin-top: 45px;
-}
+<style lang="sass" scoped>
+h1
+  text-align: center
+  margin-top: 45px
 
-p {
-  text-align: center;
-  margin-bottom: 50px;
-}
 
-.inputs {
-  max-width: fit-content;
-  margin: 0 auto;
+p
+  text-align: center
+  margin-bottom: 50px
 
-  .small {
-    margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 50px;
-  }
-}
+
+.inputs
+  max-width: fit-content
+  margin: 0 auto
+
+  .small
+    margin-top: 10px
+    display: flex
+    justify-content: space-between
+    margin-bottom: 50px
 </style>
