@@ -3,13 +3,15 @@
     ><div class="chat">
       <header class="header">
         <Logo></Logo>
-        <button class="settings" @click="handleLogout">
-          <img
-            src="../../../public/res/logout.png"
-            class="logout"
-            alt="logout"
-          />
-        </button>
+        <router-link to="/login">
+          <button class="settings" @click="handleLogout">
+            <img
+              src="../../../public/res/logout.png"
+              class="logout"
+              alt="logout"
+            />
+          </button>
+        </router-link>
       </header>
       <div class="content"></div>
       <div class="typingarea">

@@ -63,6 +63,8 @@ export default {
     async handleRegister() {
       try {
         await register(this.name, this.email, this.password);
+        this.$router.push({ name: "chat" });
+        location.reload();
         this.name = "";
         this.email = "";
         this.password = "";

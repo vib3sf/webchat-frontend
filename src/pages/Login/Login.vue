@@ -22,8 +22,8 @@
         />
         <PasswordInput v-model="password" width="400px" height="40px" />
       </div>
-      <Button @click="handleLogin"> Sign up </Button></FormWrapper
-    >
+      <Button @click="handleLogin"> Sign up </Button>
+    </FormWrapper>
   </Wrapper>
 </template>
 
@@ -56,6 +56,8 @@ export default {
     async handleLogin() {
       try {
         await login(this.name, this.password);
+        this.$router.push({ name: "chat" });
+        location.reload();
         this.name = "";
         this.password = "";
       } catch (error) {
