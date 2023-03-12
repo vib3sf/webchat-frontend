@@ -28,8 +28,11 @@
           <PasswordInput v-model="password" width="195px" height="40px" />
         </div>
       </div>
-      <Button @click="handleRegister"> Sign in </Button></FormWrapper
-    >
+      <Button @click="handleRegister" @keydown.enter="handleRegister">
+        Sign in
+      </Button>
+      <p class="error">{{ error }}</p>
+    </FormWrapper>
   </Wrapper>
 </template>
 
@@ -57,6 +60,7 @@ export default {
       name: "",
       email: "",
       password: "",
+      error: "",
     };
   },
   methods: {
@@ -69,7 +73,10 @@ export default {
         this.email = "";
         this.password = "";
       } catch (error) {
-        console.log(error);
+        this.error = "Something went wrong. Please try again later!";
+        setTimeout(() => {
+          this.error = "";
+        }, 3000);
       }
     },
   },
@@ -96,4 +103,8 @@ p
     display: flex
     justify-content: space-between
     margin-bottom: 50px
+
+.error
+  color: red
+  font-weight: bold
 </style>

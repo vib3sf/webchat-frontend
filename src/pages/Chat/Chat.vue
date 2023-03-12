@@ -15,7 +15,7 @@
         </router-link>
       </header>
       <div class="content" id="content" ref="messages">
-        <p class="log">{{ log }}</p>
+        <div class="log">{{ log }}</div>
         <Message
           v-for="(message, idx) in messages"
           :key="idx"
@@ -171,13 +171,15 @@ export default {
     -ms-overflow-style: none
     scrollbar-width: none
 
+    .log
+      width: fit-content
+      height: 50px
+      margin: 0 auto
+      margin-top: 10px
+
   .content::-webkit-scrollbar
     width: 0
     height: 0
-
-
-    .log
-      text-align: center
 
   .typingarea
     max-width: 100%

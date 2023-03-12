@@ -23,6 +23,7 @@
         <PasswordInput v-model="password" width="400px" height="40px" />
       </div>
       <Button @click="handleLogin"> Sign up </Button>
+      <p class="error">{{ error }}</p>
     </FormWrapper>
   </Wrapper>
 </template>
@@ -50,6 +51,7 @@ export default {
     return {
       name: "",
       password: "",
+      error: "",
     };
   },
   methods: {
@@ -61,7 +63,10 @@ export default {
         this.name = "";
         this.password = "";
       } catch (error) {
-        console.log(error);
+        this.error = "Somethint went wrong. Please try again later!";
+        setTimeout(() => {
+          this.error = "";
+        }, 3000);
       }
     },
   },
@@ -86,4 +91,8 @@ p
 
   input:first-child
     margin-bottom: 10px
+
+.error
+  color: red
+  font-weight: bold
 </style>
