@@ -3,7 +3,7 @@
     ><div class="chat">
       <header class="header">
         <p class="users">{{ users.length }} users online</p>
-        <Logo></Logo>
+        <Logo style="margin: 0"></Logo>
         <router-link to="/login">
           <button class="settings" @click="handleLogout">
             <img
@@ -134,6 +134,7 @@ export default {
   background-color: #ffffff
   margin: 0 auto
   border-radius: 15px
+  margin-top: 20px
 
   .header
     max-width: 100%
@@ -141,13 +142,13 @@ export default {
     margin: 0 auto
     margin-bottom: 20px
     text-align: center
-    position: relative
+    display: flex
+    justify-content: space-between
 
     .users
-      position: absolute
-      right: 880px
-      top: 10px
       font-weight: bold
+      margin-left: 20px
+      margin-top: 25px
 
     .settings
       height: fit-content
@@ -158,9 +159,8 @@ export default {
       font-size: 30px
       color: gray
       font-weight: bold
-      position: absolute
-      top: 20px
-      left: 940px
+      margin-right: 20px
+      margin-top: 20px
 
   .content
     max-width: 100%

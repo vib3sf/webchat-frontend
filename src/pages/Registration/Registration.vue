@@ -11,21 +11,21 @@
       </p>
       <div class="inputs">
         <Input
-          v-model="name"
-          width="400px"
+          v-model="email"
+          width="100%"
           height="40px"
-          placeholder="Nickname"
+          placeholder="Email"
           type="text"
         />
         <div class="small">
           <Input
-            v-model="email"
-            type="email"
-            placeholder="Email"
-            width="195px"
+            v-model="name"
+            type="text"
+            placeholder="Nickname"
+            width="63%"
             height="40px"
           />
-          <PasswordInput v-model="password" width="195px" height="40px" />
+          <PasswordInput v-model="password" width="100%" height="40px" />
         </div>
       </div>
       <Button @click="handleRegister" @keydown.enter="handleRegister">
@@ -95,7 +95,7 @@ p
 
 
 .inputs
-  max-width: fit-content
+  max-width: 400px
   margin: 0 auto
 
   .small

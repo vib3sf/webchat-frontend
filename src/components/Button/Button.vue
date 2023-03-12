@@ -12,10 +12,10 @@ export default {
 
 <style lang="sass" scoped>
 .button
-  max-width: fit-content
+  max-width: 400px
   margin: 0 auto
   button
-    width: 400px
+    width: 100%
     height: 40px
     color: #ffffff
     font-size: 24px

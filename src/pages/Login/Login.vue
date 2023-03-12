@@ -15,12 +15,12 @@
       <div class="inputs">
         <Input
           v-model="name"
-          width="400px"
+          width="100%"
           height="40px"
           placeholder="Nickname"
           type="text"
         />
-        <PasswordInput v-model="password" width="400px" height="40px" />
+        <PasswordInput v-model="password" width="100%" height="40px" />
       </div>
       <Button @click="handleLogin"> Sign up </Button>
       <p class="error">{{ error }}</p>
@@ -85,7 +85,7 @@ p
 
 
 .inputs
-  max-width: fit-content
+  max-width: 400px
   margin: 0 auto
   margin-bottom: 50px
 
