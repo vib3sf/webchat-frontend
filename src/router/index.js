@@ -33,6 +33,8 @@ router.beforeEach((to, from, next) => {
   const requireAuth = to.matched.some((record) => record.meta.auth);
   if (!token && requireAuth) {
     next("/login");
+  } else if (token && !requireAuth) {
+    next("/chat");
   } else {
     next();
   }

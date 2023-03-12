@@ -13,21 +13,25 @@
           </button>
         </router-link>
       </header>
-      <div class="content"></div>
+      <div class="content">
+        <p class="log">{{ log }}</p>
+      </div>
       <div class="typingarea">
-        <button class="smile-button">
-          <img src="../../../public/res/smile.png" alt="smile" />
-        </button>
         <div class="inp">
           <Input
+            v-model="message"
             type="text"
             width="100%"
             height="40px"
             placeholder="Start typing"
           />
         </div>
-        <button class="send-button">
-          <img src="../../../public/res/send.png" alt="send" />
+        <button class="send-button" @click="addMessage">
+          <img
+            src="../../../public/res/send.png"
+            alt="send"
+            @click="addMessage"
+          />
         </button>
       </div></div
   ></Wrapper>
@@ -38,7 +42,18 @@ import Wrapper from "../../components/Wrapper/Wrapper.vue";
 import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
 import { removeSessionFromStorage } from "../../helpers/tokens.js";
-import { removeUserFromStorage } from "../../helpers/user.js";
+import {
+  getUserFromStorage,
+  removeUserFromStorage,
+} from "../../helpers/user.js";
+import { io } from "socket.io-client";
+import { nanoid } from "nanoid";
+const socket = io("http://localhost:5000", {
+  query: {
+    roomId: "famiChat",
+    userName: JSON.parse(getUserFromStorage())?.name,
+  },
+});
 export default {
   name: "Chat",
   components: {
@@ -46,11 +61,49 @@ export default {
     Logo,
     Input,
   },
+  data() {
+    return {
+      user: JSON.parse(getUserFromStorage()),
+      message: "",
+      messages: [],
+      users: [],
+      roomId: localStorage.getItem("roomId"),
+      socket: null,
+      log: "",
+    };
+  },
   methods: {
     handleLogout() {
       removeSessionFromStorage();
       removeUserFromStorage();
+      socket.off();
     },
+    addMessage() {
+      socket.emit("message:add", {
+        roomId: this.roomId,
+        userName: this.user.name,
+        text: this.message,
+        userId: this.user._id,
+        messageId: nanoid(),
+      });
+    },
+  },
+  created() {
+    socket.emit("message:get");
+    socket.on("message-list:update", (messages) => {
+      console.log(messages);
+      this.messages = messages;
+    });
+    socket.emit("user:add", this.user?.name);
+    socket.on("log", (log) => {
+      this.log = log;
+      setTimeout(() => {
+        this.log = "";
+      }, 2000);
+    });
+    socket.on("user-list:update", (users) => {
+      this.users = users;
+    });
   },
 };
 </script>
@@ -88,22 +141,14 @@ export default {
     border-top: 1px solid gray
     border-bottom: 1px solid gray
 
+    .log
+      text-align: center
+
   .typingarea
     max-width: 100%
     height: 78.6px
     display: flex
-
-    .smile-button
-      background-color: #ffffff
-      width: fit-content
-      height: fit-content
-      margin: 0 10px
-      border: none
-
-      img
-        width: 24px
-        cursor: pointer
-        margin-top: 27.3px
+    padding-left: 10px
 
     .inp
         width: 100%
