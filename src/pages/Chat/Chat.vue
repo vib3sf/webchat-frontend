@@ -2,6 +2,7 @@
   <Wrapper
     ><div class="chat">
       <header class="header">
+        <p class="users">{{ users.length }} users online</p>
         <Logo></Logo>
         <router-link to="/login">
           <button class="settings" @click="handleLogout">
@@ -13,8 +14,16 @@
           </button>
         </router-link>
       </header>
-      <div class="content">
+      <div class="content" id="content" ref="messages">
         <p class="log">{{ log }}</p>
+        <Message
+          v-for="(message, idx) in messages"
+          :key="idx"
+          :userId="message.userId"
+          :text="message.text"
+          :time="message.createdAt"
+          :userName="message.userName"
+        />
       </div>
       <div class="typingarea">
         <div class="inp">
@@ -26,11 +35,11 @@
             placeholder="Start typing"
           />
         </div>
-        <button class="send-button" @click="addMessage">
+        <button class="send-button">
           <img
             src="../../../public/res/send.png"
             alt="send"
-            @click="addMessage"
+            @click.stop="addMessage"
           />
         </button>
       </div></div
@@ -41,6 +50,7 @@
 import Wrapper from "../../components/Wrapper/Wrapper.vue";
 import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
+import Message from "../../components/Message/Message.vue";
 import { removeSessionFromStorage } from "../../helpers/tokens.js";
 import {
   getUserFromStorage,
@@ -48,18 +58,14 @@ import {
 } from "../../helpers/user.js";
 import { io } from "socket.io-client";
 import { nanoid } from "nanoid";
-const socket = io("http://localhost:5000", {
-  query: {
-    roomId: "famiChat",
-    userName: JSON.parse(getUserFromStorage())?.name,
-  },
-});
 export default {
+  $el: "app",
   name: "Chat",
   components: {
     Wrapper,
     Logo,
     Input,
+    Message,
   },
   data() {
     return {
@@ -67,7 +73,7 @@ export default {
       message: "",
       messages: [],
       users: [],
-      roomId: localStorage.getItem("roomId"),
+      roomId: "famiChat",
       socket: null,
       log: "",
     };
@@ -76,34 +82,47 @@ export default {
     handleLogout() {
       removeSessionFromStorage();
       removeUserFromStorage();
-      socket.off();
     },
     addMessage() {
-      socket.emit("message:add", {
+      this.socket.emit("message:add", {
         roomId: this.roomId,
         userName: this.user.name,
         text: this.message,
         userId: this.user._id,
         messageId: nanoid(),
       });
+      this.message = "";
     },
   },
   created() {
-    socket.emit("message:get");
-    socket.on("message-list:update", (messages) => {
-      console.log(messages);
-      this.messages = messages;
+    this.socket = io("http://localhost:5000", {
+      query: {
+        roomId: "famiChat",
+        userName: JSON.parse(getUserFromStorage())?.name,
+      },
     });
-    socket.emit("user:add", this.user?.name);
-    socket.on("log", (log) => {
+    this.socket.emit("message:get");
+    this.socket.on("message-list:update", (messages) => {
+      this.messages = messages;
+      setTimeout(() => {
+        let div = this.$refs.messages;
+        div.scrollTop = div.scrollHeight - div.clientHeight;
+      }, 1000);
+    });
+    this.socket.emit("user:add", this.user?.name);
+    this.socket.on("log", (log) => {
       this.log = log;
       setTimeout(() => {
         this.log = "";
       }, 2000);
     });
-    socket.on("user-list:update", (users) => {
+    this.socket.on("user-list:update", (users) => {
       this.users = users;
     });
+    setTimeout(() => {
+      let div = this.$refs.messages;
+      div.scrollTop = div.scrollHeight - div.clientHeight;
+    }, 1000);
   },
 };
 </script>
@@ -119,14 +138,19 @@ export default {
   .header
     max-width: 100%
     height: 50px
+    margin: 0 auto
     margin-bottom: 20px
-    position: relative
     text-align: center
+    position: relative
+
+    .users
+      position: absolute
+      right: 880px
+      top: 10px
+      font-weight: bold
 
     .settings
-      position: absolute
-      left: 950px
-      top: 17px
+      height: fit-content
       background-color: #ffffff
       outline: none
       border: none
@@ -134,12 +158,23 @@ export default {
       font-size: 30px
       color: gray
       font-weight: bold
+      position: absolute
+      top: 20px
+      left: 940px
 
   .content
     max-width: 100%
     height: 450px
     border-top: 1px solid gray
     border-bottom: 1px solid gray
+    overflow: auto
+    -ms-overflow-style: none
+    scrollbar-width: none
+
+  .content::-webkit-scrollbar
+    width: 0
+    height: 0
+
 
     .log
       text-align: center
