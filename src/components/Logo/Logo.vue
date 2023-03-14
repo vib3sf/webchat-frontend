@@ -2,11 +2,7 @@
   <h3>FaMI Chat</h3>
 </template>
 
-<script>
-export default {
-  name: "Logo",
-};
-</script>
+<script setup></script>
 
 <style lang="sass" scoped>
 h3

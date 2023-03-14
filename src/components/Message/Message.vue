@@ -1,3 +1,12 @@
+<script setup>
+import { reactive, defineProps } from "vue";
+const props = defineProps(["userId", "userName", "text", "time"]);
+const user = reactive(JSON.parse(localStorage.getItem("user")));
+function checkMessage() {
+  return props.userId === user._id ? "your-message" : "other-message";
+}
+</script>
+
 <template>
   <div :class="checkMessage()">
     <div class="name" v-if="userId != user._id">
@@ -7,25 +16,6 @@
     <p class="time"><timeago :datetime="time"></timeago></p>
   </div>
 </template>
-
-<script>
-export default {
-  name: "OtherMessage",
-  props: ["userId", "userName", "text", "time"],
-  data() {
-    return {
-      user: JSON.parse(localStorage.getItem("user")),
-    };
-  },
-  methods: {
-    checkMessage() {
-      return this.$props.userId === this.user._id
-        ? "your-message"
-        : "other-message";
-    },
-  },
-};
-</script>
 
 <style lang="sass" scoped>
 .other-message

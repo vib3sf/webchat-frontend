@@ -1,18 +1,25 @@
+<script setup>
+import { ref } from "vue";
+// eslint-disable-next-line no-undef
+const props = defineProps([
+  "width",
+  "height",
+  "placeholder",
+  "modelValue",
+  "type",
+]);
+const width = ref(props.width);
+const height = ref(props.height);
+</script>
+
 <template>
   <input
     @input="$emit('update:modelValue', $event.target.value)"
-    :value="modelValue"
-    :placeholder="placeholder"
-    :type="type"
+    :value="props.modelValue"
+    :placeholder="props.placeholder"
+    :type="props.type"
   />
 </template>
-
-<script>
-export default {
-  name: "PasswordInput",
-  props: ["width", "height", "placeholder", "modelValue", "type"],
-};
-</script>
 
 <style lang="sass" scoped>
 input

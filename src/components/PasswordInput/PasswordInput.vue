@@ -1,36 +1,32 @@
+<script setup>
+import { ref, defineProps } from "vue";
+const props = defineProps(["width", "height", "modelValue"]);
+const isShowed = ref(false);
+const width = ref(props.width);
+const height = ref(props.height);
+</script>
+
 <template>
   <div class="passwordinput">
     <input
       @input="$emit('update:modelValue', $event.target.value)"
-      :value="modelValue"
+      :value="props.modelValue"
       placeholder="Password"
-      :type="!isShowed ? 'password' : 'text'"
+      :type="!isShowed.value ? 'password' : 'text'"
     />
     <img
       v-if="isShowed"
-      @click="isShowed = false"
+      @click="isShowed.value = false"
       src="../../../public/res/hide.png"
       alt="eye"
     /><img
-      @click="isShowed = true"
+      @click="isShowed.value = true"
       v-else
       src="../../../public/res/show.png"
       alt="eye"
     />
   </div>
 </template>
-
-<script>
-export default {
-  name: "PasswordInput",
-  props: ["width", "height", "modelValue"],
-  data() {
-    return {
-      isShowed: false,
-    };
-  },
-};
-</script>
 
 <style lang="sass" scoped>
 .passwordinput

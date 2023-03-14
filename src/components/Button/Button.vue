@@ -4,11 +4,7 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "Button",
-};
-</script>
+<script setup></script>
 
 <style lang="sass" scoped>
 .button
