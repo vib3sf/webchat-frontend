@@ -1,20 +1,24 @@
-<script setup>
-import { ref } from "vue";
-// eslint-disable-next-line no-undef
-const props = defineProps([
-  "width",
-  "height",
-  "placeholder",
-  "modelValue",
-  "type",
-]);
-const width = ref(props.width);
-const height = ref(props.height);
+<script lang="ts" setup>
+import { ref, defineProps } from "vue";
+
+interface Props {
+  width: string;
+  height: string;
+  placeholder: string;
+  modelValue: string;
+  type: string;
+}
+
+const props = defineProps<Props>();
+const width = ref<string>(props.width);
+const height = ref<string>(props.height);
 </script>
 
 <template>
   <input
-    @input="$emit('update:modelValue', $event.target.value)"
+    @input="
+      $emit('update:modelValue', ($event.target as HTMLInputElement).value)
+    "
     :value="props.modelValue"
     :placeholder="props.placeholder"
     :type="props.type"

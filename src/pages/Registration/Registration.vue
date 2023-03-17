@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { ref } from "vue";
 import Wrapper from "../../components/Wrapper/Wrapper.vue";
 import FormWrapper from "../../components/FormWrapper/FormWrapper.vue";
@@ -6,16 +6,15 @@ import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
 import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
 import Button from "../../components/Button/Button.vue";
-import { register } from "../../api/user.js";
+import { register } from "../../api/user";
 import router from "@/router";
 
-const name = ref("");
-const email = ref("");
-const password = ref("");
-const error = ref("");
+const name = ref<string>("");
+const email = ref<string>("");
+const password = ref<string>("");
+const error = ref<string>("");
 
 async function handleRegister() {
-  console.log("Тык!");
   try {
     await register(name.value, email.value, password.value);
     router.push({ name: "chat" });
@@ -23,7 +22,7 @@ async function handleRegister() {
     name.value = "";
     email.value = "";
     password.value = "";
-  } catch (error) {
+  } catch (e) {
     error.value = "Something went wrong. Please try again later!";
     setTimeout(() => {
       error.value = "";

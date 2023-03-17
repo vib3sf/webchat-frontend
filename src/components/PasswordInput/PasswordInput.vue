@@ -1,26 +1,35 @@
-<script setup>
+<script lang="ts" setup>
 import { ref, defineProps } from "vue";
-const props = defineProps(["width", "height", "modelValue"]);
-const isShowed = ref(false);
-const width = ref(props.width);
-const height = ref(props.height);
+
+interface Props {
+  width: string;
+  height: string;
+  modelValue: string;
+}
+
+const props = defineProps<Props>();
+const isShowed = ref<boolean>(false);
+const width = ref<string>(props.width);
+const height = ref<string>(props.height);
 </script>
 
 <template>
   <div class="passwordinput">
     <input
-      @input="$emit('update:modelValue', $event.target.value)"
+      @input="
+        $emit('update:modelValue', ($event.target as HTMLInputElement).value)
+      "
       :value="props.modelValue"
       placeholder="Password"
-      :type="!isShowed.value ? 'password' : 'text'"
+      :type="!isShowed ? 'password' : 'text'"
     />
     <img
       v-if="isShowed"
-      @click="isShowed.value = false"
+      @click="isShowed = false"
       src="../../../public/res/hide.png"
       alt="eye"
     /><img
-      @click="isShowed.value = true"
+      @click="isShowed = true"
       v-else
       src="../../../public/res/show.png"
       alt="eye"

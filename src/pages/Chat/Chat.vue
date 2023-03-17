@@ -1,26 +1,39 @@
-<script setup>
+<script lang="ts" setup>
 import { ref, reactive, onMounted } from "vue";
 import Wrapper from "../../components/Wrapper/Wrapper.vue";
 import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
 import Message from "../../components/Message/Message.vue";
-import { removeSessionFromStorage } from "../../helpers/tokens.js";
-import {
-  getUserFromStorage,
-  removeUserFromStorage,
-} from "../../helpers/user.js";
-import { io } from "socket.io-client";
+import { removeSessionFromStorage } from "../../helpers/tokens";
+import { getUserFromStorage, removeUserFromStorage } from "../../helpers/user";
+import { io, Socket } from "socket.io-client";
 import { nanoid } from "nanoid";
+import { DefaultEventsMap } from "@socket.io/component-emitter";
 
-const user = reactive(JSON.parse(getUserFromStorage()));
-const message = ref("");
-const messages = reactive([]);
-const users = reactive([]);
+interface User {
+  _id: string;
+  email: string;
+  name: string;
+}
+
+interface IMessage {
+  messageId: string;
+  text: string;
+  roomId: string;
+  userId: string;
+  userName: string;
+  createdAt: string;
+}
+
+const user = reactive(JSON.parse(getUserFromStorage() || "{}"));
+const message = ref<string>("");
+const messages = reactive<Array<IMessage>>([]);
+const users = reactive<Array<User>>([]);
 const roomId = "famiChat";
-const log = ref("");
-const block = ref(null);
+const log = ref<string>("");
+const block = ref<HTMLElement>(document.body);
 
-var socket = null;
+var socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 
 function handleLogout() {
   removeSessionFromStorage();
@@ -47,7 +60,7 @@ onMounted(() => {
   });
   socket.emit("message:get");
   socket.on("message-list:update", (msgs) => {
-    msgs.map((msg) => messages.push(msg));
+    msgs.map((msg: IMessage) => messages.push(msg));
     setTimeout(() => {
       let div = block.value;
       div.scrollTop = div.scrollHeight - div.clientHeight;
@@ -61,7 +74,7 @@ onMounted(() => {
     }, 2000);
   });
   socket.on("user-list:update", (us) => {
-    us.map((user) => users.push(user));
+    us.map((user: User) => users.push(user));
   });
   setTimeout(() => {
     let div = block.value;

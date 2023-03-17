@@ -29,8 +29,8 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const token = getSessionFromStorage();
-  const requireAuth = to.matched.some((record) => record.meta.auth);
+  const token: string | null = getSessionFromStorage();
+  const requireAuth: boolean = to.matched.some((record) => record.meta.auth);
   if (!token && requireAuth) {
     next("/login");
   } else if (token && !requireAuth) {

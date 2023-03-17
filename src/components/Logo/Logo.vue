@@ -2,7 +2,7 @@
   <h3>FaMI Chat</h3>
 </template>
 
-<script setup></script>
+<script lang="ts" setup></script>
 
 <style lang="sass" scoped>
 h3

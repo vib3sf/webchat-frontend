@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import { ref } from "vue";
 import Wrapper from "../../components/Wrapper/Wrapper.vue";
 import FormWrapper from "../../components/FormWrapper/FormWrapper.vue";
@@ -6,12 +6,12 @@ import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
 import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
 import Button from "../../components/Button/Button.vue";
-import { login } from "../../api/user.js";
+import { login } from "../../api/user";
 import router from "@/router";
 
-const name = ref("");
-const password = ref("");
-const error = ref("");
+const name = ref<string>("");
+const password = ref<string>("");
+const error = ref<string>("");
 
 async function handleLogin() {
   try {
@@ -21,7 +21,6 @@ async function handleLogin() {
     name.value = "";
     password.value = "";
   } catch (e) {
-    console.log(e);
     error.value = "Somethint went wrong. Please try again later!";
     setTimeout(() => {
       error.value = "";
