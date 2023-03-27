@@ -1,3 +1,36 @@
+<script lang="ts" setup>
+import { ref } from "vue";
+import Wrapper from "../../components/Wrapper/Wrapper.vue";
+import FormWrapper from "../../components/FormWrapper/FormWrapper.vue";
+import Logo from "../../components/Logo/Logo.vue";
+import Input from "../../components/Input/Input.vue";
+import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
+import Button from "../../components/Button/Button.vue";
+import { register } from "../../api/user";
+import router from "@/router";
+
+const name = ref<string>("");
+const email = ref<string>("");
+const password = ref<string>("");
+const error = ref<string>("");
+
+async function handleRegister() {
+  try {
+    await register(name.value, email.value, password.value);
+    router.push({ name: "chat" });
+    location.reload();
+    name.value = "";
+    email.value = "";
+    password.value = "";
+  } catch (e) {
+    error.value = "Something went wrong. Please try again later!";
+    setTimeout(() => {
+      error.value = "";
+    }, 3000);
+  }
+}
+</script>
+
 <template>
   <Wrapper>
     <FormWrapper
@@ -35,53 +68,6 @@
     </FormWrapper>
   </Wrapper>
 </template>
-
-<script>
-import Wrapper from "../../components/Wrapper/Wrapper.vue";
-import FormWrapper from "../../components/FormWrapper/FormWrapper.vue";
-import Logo from "../../components/Logo/Logo.vue";
-import Input from "../../components/Input/Input.vue";
-import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
-import Button from "../../components/Button/Button.vue";
-import { register } from "../../api/user.js";
-
-export default {
-  name: "Registration",
-  components: {
-    Wrapper,
-    FormWrapper,
-    Logo,
-    Input,
-    PasswordInput,
-    Button,
-  },
-  data() {
-    return {
-      name: "",
-      email: "",
-      password: "",
-      error: "",
-    };
-  },
-  methods: {
-    async handleRegister() {
-      try {
-        await register(this.name, this.email, this.password);
-        this.$router.push({ name: "chat" });
-        location.reload();
-        this.name = "";
-        this.email = "";
-        this.password = "";
-      } catch (error) {
-        this.error = "Something went wrong. Please try again later!";
-        setTimeout(() => {
-          this.error = "";
-        }, 3000);
-      }
-    },
-  },
-};
-</script>
 
 <style lang="sass" scoped>
 h1

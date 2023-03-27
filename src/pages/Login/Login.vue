@@ -1,3 +1,34 @@
+<script lang="ts" setup>
+import { ref } from "vue";
+import Wrapper from "../../components/Wrapper/Wrapper.vue";
+import FormWrapper from "../../components/FormWrapper/FormWrapper.vue";
+import Logo from "../../components/Logo/Logo.vue";
+import Input from "../../components/Input/Input.vue";
+import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
+import Button from "../../components/Button/Button.vue";
+import { login } from "../../api/user";
+import router from "@/router";
+
+const name = ref<string>("");
+const password = ref<string>("");
+const error = ref<string>("");
+
+async function handleLogin() {
+  try {
+    await login(name.value, password.value);
+    router.push({ name: "chat" });
+    location.reload();
+    name.value = "";
+    password.value = "";
+  } catch (e) {
+    error.value = "Somethint went wrong. Please try again later!";
+    setTimeout(() => {
+      error.value = "";
+    }, 3000);
+  }
+}
+</script>
+
 <template>
   <Wrapper>
     <FormWrapper
@@ -27,51 +58,6 @@
     </FormWrapper>
   </Wrapper>
 </template>
-
-<script>
-import Wrapper from "../../components/Wrapper/Wrapper.vue";
-import FormWrapper from "../../components/FormWrapper/FormWrapper.vue";
-import Logo from "../../components/Logo/Logo.vue";
-import Input from "../../components/Input/Input.vue";
-import PasswordInput from "../../components/PasswordInput/PasswordInput.vue";
-import Button from "../../components/Button/Button.vue";
-import { login } from "../../api/user.js";
-
-export default {
-  name: "Login",
-  components: {
-    Wrapper,
-    FormWrapper,
-    Logo,
-    Input,
-    PasswordInput,
-    Button,
-  },
-  data() {
-    return {
-      name: "",
-      password: "",
-      error: "",
-    };
-  },
-  methods: {
-    async handleLogin() {
-      try {
-        await login(this.name, this.password);
-        this.$router.push({ name: "chat" });
-        location.reload();
-        this.name = "";
-        this.password = "";
-      } catch (error) {
-        this.error = "Somethint went wrong. Please try again later!";
-        setTimeout(() => {
-          this.error = "";
-        }, 3000);
-      }
-    },
-  },
-};
-</script>
 
 <style lang="sass" scoped>
 h1

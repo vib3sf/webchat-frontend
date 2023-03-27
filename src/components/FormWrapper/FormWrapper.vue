@@ -2,11 +2,7 @@
   <div class="formwrapper"><slot></slot></div>
 </template>
 
-<script>
-export default {
-  name: "FormWrapper",
-};
-</script>
+<script lang="ts" setup></script>
 
 <style lang="sass" scoped>
 .formwrapper

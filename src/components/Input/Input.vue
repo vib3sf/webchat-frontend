@@ -1,18 +1,29 @@
+<script lang="ts" setup>
+import { ref, defineProps } from "vue";
+
+interface Props {
+  width: string;
+  height: string;
+  placeholder: string;
+  modelValue: string;
+  type: string;
+}
+
+const props = defineProps<Props>();
+const width = ref<string>(props.width);
+const height = ref<string>(props.height);
+</script>
+
 <template>
   <input
-    @input="$emit('update:modelValue', $event.target.value)"
-    :value="modelValue"
-    :placeholder="placeholder"
-    :type="type"
+    @input="
+      $emit('update:modelValue', ($event.target as HTMLInputElement).value)
+    "
+    :value="props.modelValue"
+    :placeholder="props.placeholder"
+    :type="props.type"
   />
 </template>
-
-<script>
-export default {
-  name: "PasswordInput",
-  props: ["width", "height", "placeholder", "modelValue", "type"],
-};
-</script>
 
 <style lang="sass" scoped>
 input

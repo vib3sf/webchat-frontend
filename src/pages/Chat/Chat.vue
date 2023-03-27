@@ -1,3 +1,88 @@
+<script lang="ts" setup>
+import { ref, reactive, onMounted } from "vue";
+import Wrapper from "../../components/Wrapper/Wrapper.vue";
+import Logo from "../../components/Logo/Logo.vue";
+import Input from "../../components/Input/Input.vue";
+import Message from "../../components/Message/Message.vue";
+import { removeSessionFromStorage } from "../../helpers/tokens";
+import { getUserFromStorage, removeUserFromStorage } from "../../helpers/user";
+import { io, Socket } from "socket.io-client";
+import { nanoid } from "nanoid";
+import { DefaultEventsMap } from "@socket.io/component-emitter";
+
+interface User {
+  _id: string;
+  email: string;
+  name: string;
+}
+
+interface IMessage {
+  messageId: string;
+  text: string;
+  roomId: string;
+  userId: string;
+  userName: string;
+  createdAt: string;
+}
+
+const user = reactive(JSON.parse(getUserFromStorage() || "{}"));
+const message = ref<string>("");
+const messages = reactive<Array<IMessage>>([]);
+const users = reactive<Array<User>>([]);
+const roomId = "famiChat";
+const log = ref<string>("");
+const block = ref<HTMLElement>(document.body);
+
+var socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+
+function handleLogout() {
+  removeSessionFromStorage();
+  removeUserFromStorage();
+}
+
+function addMessage() {
+  socket.emit("message:add", {
+    roomId: roomId,
+    userName: user.name,
+    text: message.value,
+    userId: user._id,
+    messageId: nanoid(),
+  });
+  message.value = "";
+}
+
+onMounted(() => {
+  socket = io("http://localhost:5000", {
+    query: {
+      roomId: "famiChat",
+      userName: user?.name,
+    },
+  });
+  socket.emit("message:get");
+  socket.on("message-list:update", (msgs) => {
+    msgs.map((msg: IMessage) => messages.push(msg));
+    setTimeout(() => {
+      let div = block.value;
+      div.scrollTop = div.scrollHeight - div.clientHeight;
+    }, 1000);
+  });
+  socket.emit("user:add", user?.name);
+  socket.on("log", (l) => {
+    log.value = l;
+    setTimeout(() => {
+      log.value = "";
+    }, 2000);
+  });
+  socket.on("user-list:update", (us) => {
+    us.map((user: User) => users.push(user));
+  });
+  setTimeout(() => {
+    let div = block.value;
+    div.scrollTop = div.scrollHeight - div.clientHeight;
+  }, 1000);
+});
+</script>
+
 <template>
   <Wrapper
     ><div class="chat">
@@ -14,7 +99,7 @@
           </button>
         </router-link>
       </header>
-      <div class="content" id="content" ref="messages">
+      <div class="content" id="content" ref="block">
         <div class="log">{{ log }}</div>
         <Message
           v-for="(message, idx) in messages"
@@ -45,87 +130,6 @@
       </div></div
   ></Wrapper>
 </template>
-
-<script>
-import Wrapper from "../../components/Wrapper/Wrapper.vue";
-import Logo from "../../components/Logo/Logo.vue";
-import Input from "../../components/Input/Input.vue";
-import Message from "../../components/Message/Message.vue";
-import { removeSessionFromStorage } from "../../helpers/tokens.js";
-import {
-  getUserFromStorage,
-  removeUserFromStorage,
-} from "../../helpers/user.js";
-import { io } from "socket.io-client";
-import { nanoid } from "nanoid";
-export default {
-  $el: "app",
-  name: "Chat",
-  components: {
-    Wrapper,
-    Logo,
-    Input,
-    Message,
-  },
-  data() {
-    return {
-      user: JSON.parse(getUserFromStorage()),
-      message: "",
-      messages: [],
-      users: [],
-      roomId: "famiChat",
-      socket: null,
-      log: "",
-    };
-  },
-  methods: {
-    handleLogout() {
-      removeSessionFromStorage();
-      removeUserFromStorage();
-    },
-    addMessage() {
-      this.socket.emit("message:add", {
-        roomId: this.roomId,
-        userName: this.user.name,
-        text: this.message,
-        userId: this.user._id,
-        messageId: nanoid(),
-      });
-      this.message = "";
-    },
-  },
-  created() {
-    this.socket = io("http://localhost:5000", {
-      query: {
-        roomId: "famiChat",
-        userName: JSON.parse(getUserFromStorage())?.name,
-      },
-    });
-    this.socket.emit("message:get");
-    this.socket.on("message-list:update", (messages) => {
-      this.messages = messages;
-      setTimeout(() => {
-        let div = this.$refs.messages;
-        div.scrollTop = div.scrollHeight - div.clientHeight;
-      }, 1000);
-    });
-    this.socket.emit("user:add", this.user?.name);
-    this.socket.on("log", (log) => {
-      this.log = log;
-      setTimeout(() => {
-        this.log = "";
-      }, 2000);
-    });
-    this.socket.on("user-list:update", (users) => {
-      this.users = users;
-    });
-    setTimeout(() => {
-      let div = this.$refs.messages;
-      div.scrollTop = div.scrollHeight - div.clientHeight;
-    }, 1000);
-  },
-};
-</script>
 
 <style lang="sass" scoped>
 .chat

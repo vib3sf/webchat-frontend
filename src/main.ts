@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import store from "./store";
+import { createPinia } from "pinia";
 import timeago from "vue-timeago3";
 
-createApp(App).use(store).use(timeago).use(router).mount("#app");
+createApp(App).use(createPinia()).use(timeago).use(router).mount("#app");

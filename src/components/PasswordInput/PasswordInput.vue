@@ -1,8 +1,25 @@
+<script lang="ts" setup>
+import { ref, defineProps } from "vue";
+
+interface Props {
+  width: string;
+  height: string;
+  modelValue: string;
+}
+
+const props = defineProps<Props>();
+const isShowed = ref<boolean>(false);
+const width = ref<string>(props.width);
+const height = ref<string>(props.height);
+</script>
+
 <template>
   <div class="passwordinput">
     <input
-      @input="$emit('update:modelValue', $event.target.value)"
-      :value="modelValue"
+      @input="
+        $emit('update:modelValue', ($event.target as HTMLInputElement).value)
+      "
+      :value="props.modelValue"
       placeholder="Password"
       :type="!isShowed ? 'password' : 'text'"
     />
@@ -19,18 +36,6 @@
     />
   </div>
 </template>
-
-<script>
-export default {
-  name: "PasswordInput",
-  props: ["width", "height", "modelValue"],
-  data() {
-    return {
-      isShowed: false,
-    };
-  },
-};
-</script>
 
 <style lang="sass" scoped>
 .passwordinput
