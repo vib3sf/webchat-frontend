@@ -4,15 +4,13 @@ import { addUserToStorage } from "../helpers/user";
 import { request } from "./request";
 
 export const login = async (name: string, password: string) => {
-  const headers = new AxiosHeaders();
+  const user = { username: name, password: password };
   const responce = await request({
-    url: "/auth/signin",
+    url: "/login",
     method: "POST",
     data: {
-      name,
-      password,
+      user,
     },
-    headers,
   });
   addSessionToStorage(responce.token);
   addUserToStorage(JSON.stringify(responce.user));
@@ -21,18 +19,19 @@ export const login = async (name: string, password: string) => {
 export const register = async (
   name: string,
   password: string,
-  email: string
+  confirmation_password: string
 ) => {
-  const headers = new AxiosHeaders();
+  const user = {
+    username: name,
+    password: password,
+    confirmation_password: confirmation_password,
+  };
   await request({
-    url: "/auth/signup",
+    url: "/register",
     method: "POST",
     data: {
-      name,
-      password,
-      email,
+      user,
     },
-    headers,
   });
   login(name, password);
 };

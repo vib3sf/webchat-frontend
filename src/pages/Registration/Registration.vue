@@ -10,17 +10,17 @@ import { register } from "../../api/user";
 import router from "@/router";
 
 const name = ref<string>("");
-const email = ref<string>("");
+const confirmationPassword = ref<string>("");
 const password = ref<string>("");
 const error = ref<string>("");
 
 async function handleRegister() {
   try {
-    await register(name.value, email.value, password.value);
+    await register(name.value, password.value, confirmationPassword.value);
     router.push({ name: "chat" });
     location.reload();
     name.value = "";
-    email.value = "";
+    confirmationPassword.value = "";
     password.value = "";
   } catch (e) {
     error.value = "Something went wrong. Please try again later!";
@@ -44,17 +44,15 @@ async function handleRegister() {
       </p>
       <div class="inputs">
         <Input
-          v-model="email"
+          v-model="name"
           width="100%"
           height="40px"
-          placeholder="Email"
+          placeholder="Nickname"
           type="text"
         />
         <div class="small">
-          <Input
-            v-model="name"
-            type="text"
-            placeholder="Nickname"
+          <PasswordInput
+            v-model="confirmationPassword"
             width="63%"
             height="40px"
           />

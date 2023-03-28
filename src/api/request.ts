@@ -6,13 +6,16 @@ interface Headers {
 }
 
 interface Data {
-  name: string;
+  user: User;
+}
+
+interface User {
+  username: string;
   password: string;
-  email?: string;
+  confirmation_password?: string;
 }
 
 export interface Request {
-  headers: AxiosHeaders;
   method: string;
   url: string;
   data: Data;
@@ -20,24 +23,11 @@ export interface Request {
 }
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "http://localhost:3000",
 });
 
-export const request = async ({
-  headers,
-  method,
-  url,
-  data,
-  params,
-}: Request) => {
-  const accessToken = getSessionFromStorage() || {};
-
-  if (accessToken && headers) {
-    headers.Authorization = `Bearer ${accessToken}`;
-  }
-
+export const request = async ({ method, url, data, params }: Request) => {
   const options = {
-    headers,
     method,
     data,
     params,
