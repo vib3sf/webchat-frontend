@@ -24,7 +24,7 @@ export const register = async (
   const user = {
     username: name,
     password: password,
-    confirmation_password: confirmation_password,
+    password_confirmation: confirmation_password,
   };
   await request({
     url: "/register",

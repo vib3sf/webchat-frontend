@@ -9,7 +9,7 @@ interface Props {
 }
 
 interface User {
-  _id: string;
+  id: string;
   name: string;
   email: string;
 }
@@ -17,13 +17,13 @@ interface User {
 const props = defineProps<Props>();
 const user = reactive<User>(JSON.parse(localStorage.getItem("user") || "{}"));
 function checkMessage(): string {
-  return props.userId === user._id ? "your-message" : "other-message";
+  return props.userId === user.id ? "your-message" : "other-message";
 }
 </script>
 
 <template>
   <div :class="checkMessage()">
-    <div class="name" v-if="userId != user._id">
+    <div class="name" v-if="userId != user.id">
       {{ userName }}
     </div>
     <p class="text">{{ text }}</p>

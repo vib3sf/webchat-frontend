@@ -5,81 +5,88 @@ import Logo from "../../components/Logo/Logo.vue";
 import Input from "../../components/Input/Input.vue";
 import Message from "../../components/Message/Message.vue";
 import { removeSessionFromStorage } from "../../helpers/tokens";
-import { getUserFromStorage, removeUserFromStorage } from "../../helpers/user";
-import { io, Socket } from "socket.io-client";
-import { nanoid } from "nanoid";
-import { DefaultEventsMap } from "@socket.io/component-emitter";
+import { removeUserFromStorage } from "../../helpers/user";
 
-interface User {
-  _id: string;
-  email: string;
-  name: string;
-}
+// interface User {
+//   _id: string;
+//   email: string;
+//   name: string;
+// }
 
 interface IMessage {
-  messageId: string;
-  text: string;
-  roomId: string;
-  userId: string;
-  userName: string;
-  createdAt: string;
+  id: string;
+  user_id: string;
+  content: string;
+  user_name: string;
+  created_at: string;
 }
 
-const user = reactive(JSON.parse(getUserFromStorage() || "{}"));
 const message = ref<string>("");
 const messages = reactive<Array<IMessage>>([]);
-const users = reactive<Array<User>>([]);
-const roomId = "famiChat";
+//const users = ref<string>("");
 const log = ref<string>("");
 const block = ref<HTMLElement>(document.body);
-
-var socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+const roomId = "ChatRoom";
 
 function handleLogout() {
   removeSessionFromStorage();
   removeUserFromStorage();
 }
 
-function addMessage() {
-  socket.emit("message:add", {
-    roomId: roomId,
-    userName: user.name,
-    text: message.value,
-    userId: user._id,
-    messageId: nanoid(),
-  });
-  message.value = "";
-}
-
-onMounted(() => {
-  socket = io("http://localhost:5000", {
-    query: {
-      roomId: "famiChat",
-      userName: user?.name,
-    },
-  });
-  socket.emit("message:get");
-  socket.on("message-list:update", (msgs) => {
-    msgs.map((msg: IMessage) => messages.push(msg));
-    setTimeout(() => {
-      let div = block.value;
-      div.scrollTop = div.scrollHeight - div.clientHeight;
-    }, 1000);
-  });
-  socket.emit("user:add", user?.name);
-  socket.on("log", (l) => {
-    log.value = l;
-    setTimeout(() => {
-      log.value = "";
-    }, 2000);
-  });
-  socket.on("user-list:update", (us) => {
-    us.map((user: User) => users.push(user));
-  });
+function scrollDown() {
   setTimeout(() => {
     let div = block.value;
     div.scrollTop = div.scrollHeight - div.clientHeight;
   }, 1000);
+}
+
+async function addMessage() {
+  const content = message.value;
+  const user_id = JSON.parse(localStorage.getItem("user") || "{}").id;
+  const user_name = JSON.parse(localStorage.getItem("user") || "{}").username;
+  await fetch("http://localhost:3000/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ user_id, user_name, content }),
+  });
+  message.value = "";
+  scrollDown();
+}
+
+const fetchMessages = async () => {
+  const responce = await fetch("http://localhost:3000/messages");
+  const data = await responce.json();
+  console.log(data);
+  messages.splice(0, messages.length, ...data);
+  scrollDown();
+};
+
+const ws = new WebSocket("ws://localhost:3000/cable");
+
+onMounted(() => {
+  ws.onopen = () => {
+    console.log("Connected to websocket");
+    ws.send(
+      JSON.stringify({
+        command: "subscribe",
+        identifier: JSON.stringify({
+          id: roomId,
+          channel: "MessagesChannel",
+        }),
+      })
+    );
+  };
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.type === "ping") return;
+    if (data.type === "welcome") return;
+    if (data.type === "confirm_subscription") return;
+    console.log(data);
+    messages.push(data.message);
+  };
+  fetchMessages();
 });
 </script>
 
@@ -87,7 +94,7 @@ onMounted(() => {
   <Wrapper
     ><div class="chat">
       <header class="header">
-        <p class="users">{{ users.length }} users online</p>
+        <p class="users">{{ 0 }} users online</p>
         <Logo style="margin: 0"></Logo>
         <router-link to="/login">
           <button class="settings" @click="handleLogout">
@@ -104,10 +111,10 @@ onMounted(() => {
         <Message
           v-for="(message, idx) in messages"
           :key="idx"
-          :userId="message.userId"
-          :text="message.text"
-          :time="message.createdAt"
-          :userName="message.userName"
+          :userId="message.user_id"
+          :text="message.content"
+          :time="message.created_at"
+          :userName="message.user_name"
         />
       </div>
       <div class="typingarea">
@@ -172,8 +179,6 @@ onMounted(() => {
     border-top: 1px solid gray
     border-bottom: 1px solid gray
     overflow: auto
-    -ms-overflow-style: none
-    scrollbar-width: none
 
     .log
       width: fit-content
