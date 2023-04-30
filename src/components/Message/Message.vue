@@ -1,11 +1,13 @@
+/* eslint-disable */
 <script lang="ts" setup>
-import { reactive, defineProps } from "vue";
+import { reactive, defineProps, ref } from "vue";
 
 interface Props {
   userId: string;
   userName: string;
   text: string;
   time: string;
+  message_id: string;
 }
 
 interface User {
@@ -15,19 +17,57 @@ interface User {
 }
 
 const props = defineProps<Props>();
+const hover = ref(true);
+const editing = ref(false);
+const updatedText = ref(" ");
 const user = reactive<User>(JSON.parse(localStorage.getItem("user") || "{}"));
 function checkMessage(): string {
   return props.userId === user.id ? "your-message" : "other-message";
 }
+function updateMessage() {
+  if (updatedText.value === props.text) {
+    editing.value = false;
+  } else {
+    console.log("1");
+  }
+}
+function editMessage() {
+  editing.value = true;
+  updatedText.value = props.text;
+}
+async function deleteMessage() {
+  console.log("1");
+  await fetch("http://localhost:3000/destroy_message", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ user_id: user.id, message_id: props.message_id }),
+  });
+}
 </script>
 
 <template>
-  <div :class="checkMessage()">
-    <div class="name" v-if="userId != user.id">
+  <div
+    :class="checkMessage()"
+    @mouseover="hover = true"
+    @mouseleave="hover = false"
+  >
+    <div class="name" v-if="userId !== user.id">
       {{ userName }}
     </div>
-    <p class="text">{{ text }}</p>
-    <p class="time"><timeago :datetime="time"></timeago></p>
+    <div v-if="editing">
+      <input v-model="updatedText" type="text" />
+      <button @click="updateMessage">Применить</button>
+    </div>
+    <p class="text" v-else>{{ text }}</p>
+    <p class="time">
+      <timeago :datetime="time"></timeago>
+    </p>
+    <div class="actions" v-if="hover && userId === user.id">
+      <button v-if="!editing" @click="editMessage">edit</button>
+      <button @click="deleteMessage">delete</button>
+    </div>
   </div>
 </template>
 
