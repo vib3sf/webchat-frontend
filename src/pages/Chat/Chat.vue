@@ -58,7 +58,6 @@ async function addMessage() {
 const fetchMessages = async () => {
   const responce = await fetch("http://localhost:3000/messages");
   const data = await responce.json();
-  console.log(data);
   messages.splice(0, messages.length, ...data);
   scrollDown();
 };
@@ -115,6 +114,7 @@ onMounted(() => {
           :text="message.content"
           :time="message.created_at"
           :userName="message.user_name"
+          :message_id="message.id"
         />
       </div>
       <div class="typingarea">
