@@ -24,19 +24,30 @@ const user = reactive<User>(JSON.parse(localStorage.getItem("user") || "{}"));
 function checkMessage(): string {
   return props.userId === user.id ? "your-message" : "other-message";
 }
-function updateMessage() {
-  if (updatedText.value === props.text) {
-    editing.value = false;
-  } else {
-    console.log("1");
-  }
-}
 function editMessage() {
   editing.value = true;
   updatedText.value = props.text;
 }
+async function updateMessage() {
+  const response = await fetch("http://localhost:3000/update_message", {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id: user.id,
+      message_id: props.message_id,
+      сontent: updatedText.value,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error("Ошибка при изменении сообщения");
+  }
+  const data = await response.json();
+  return data; // возвращаем обновленное сообщение из серверного ответа
+}
 async function deleteMessage() {
-  console.log("1");
   await fetch("http://localhost:3000/destroy_message", {
     method: "DELETE",
     headers: {
