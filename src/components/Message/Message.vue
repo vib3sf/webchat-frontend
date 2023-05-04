@@ -38,7 +38,7 @@ async function updateMessage() {
     body: JSON.stringify({
       user_id: user.id,
       message_id: props.message_id,
-      сontent: updatedText.value,
+      content: updatedText.value,
     }),
   });
   if (!response.ok) {
