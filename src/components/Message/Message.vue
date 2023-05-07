@@ -29,18 +29,19 @@ function editMessage() {
   updatedText.value = props.text;
 }
 async function updateMessage() {
-  const response = await fetch("http://localhost:3000/update_message", {
-    method: "PATCH",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      user_id: user.id,
-      message_id: props.message_id,
-      content: updatedText.value,
-    }),
-  });
+  const response = await fetch(
+    `http://localhost:3000/messages/${props.message_id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id: user.id,
+        content: updatedText.value,
+      }),
+    }
+  );
   if (!response.ok) {
     throw new Error("Ошибка при изменении сообщения");
   }
@@ -48,12 +49,12 @@ async function updateMessage() {
   return data; // возвращаем обновленное сообщение из серверного ответа
 }
 async function deleteMessage() {
-  await fetch("http://localhost:3000/destroy_message", {
+  await fetch(`http://localhost:3000/messages/${props.message_id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ user_id: user.id, message_id: props.message_id }),
+    body: JSON.stringify({ user_id: user.id }),
   });
 }
 </script>
