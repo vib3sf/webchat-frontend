@@ -23,17 +23,24 @@ const height = ref<string>(props.height);
       placeholder="Password"
       :type="!isShowed ? 'password' : 'text'"
     />
-    <img
+    <font-awesome-icon
+      v-if="isShowed"
+      @click="isShowed = false"
+      icon="fa-solid fa-eye-slash"
+    />
+    <font-awesome-icon @click="isShowed = true" v-else icon="fa-solid fa-eye" />
+    <!-- <img
       v-if="isShowed"
       @click="isShowed = false"
       src="../../../public/res/hide.png"
       alt="eye"
-    /><img
-      @click="isShowed = true"
+    /> -->
+    <!-- <img
+     @click="isShowed = true" 
       v-else
       src="../../../public/res/show.png"
       alt="eye"
-    />
+    /> -->
   </div>
 </template>
 
@@ -58,14 +65,23 @@ const height = ref<string>(props.height);
 
 
 
-  img
-    width: 36px
-    height: 36px
-
-
-  img
+  .fa-eye
     position: absolute
     right: 10px
     top: 2px
     cursor: pointer
+    width: 24px
+    height: 36px
+    &:hover
+      color: #0650d0
+
+  .fa-eye-slash
+    position: absolute
+    right: 10px
+    top: 2px
+    cursor: pointer
+    width: 24px
+    height: 36px
+    &:hover
+      color: #0650d0
 </style>

@@ -77,8 +77,14 @@ async function deleteMessage() {
       <timeago :datetime="time"></timeago>
     </p>
     <div class="actions" v-if="hover && userId === user.id">
-      <button v-if="!editing" @click="editMessage">edit</button>
-      <button @click="deleteMessage">delete</button>
+      <font-awesome-icon
+        icon="fa-solid fa-pen"
+        v-if="!editing"
+        @click="editMessage"
+      />
+      <!-- <button v-if="!editing" @click="editMessage">edit</button> -->
+      <font-awesome-icon icon="fa-solid fa-trash" @click="deleteMessage" />
+      <!-- <button @click="deleteMessage">delete</button> -->
     </div>
   </div>
 </template>

@@ -37,7 +37,7 @@ function scrollDown() {
   setTimeout(() => {
     let div = block.value;
     div.scrollTop = div.scrollHeight - div.clientHeight;
-  }, 1000);
+  }, 300);
 }
 
 async function addMessage() {
@@ -93,14 +93,13 @@ onMounted(() => {
   <Wrapper
     ><div class="chat">
       <header class="header">
-        <p class="users">{{ 0 }} users online</p>
+        <p class="users">{{ "add" }} users online</p>
         <Logo style="margin: 0"></Logo>
         <router-link to="/login">
           <button class="settings" @click="handleLogout">
-            <img
-              src="../../../public/res/logout.png"
+            <font-awesome-icon
+              icon="fa-solid fa-right-from-bracket"
               class="logout"
-              alt="logout"
             />
           </button>
         </router-link>
@@ -128,9 +127,9 @@ onMounted(() => {
           />
         </div>
         <button class="send-button">
-          <img
-            src="../../../public/res/send.png"
-            alt="send"
+          <font-awesome-icon
+            icon="fa-solid fa-paper-plane"
+            size="2xl"
             @click.stop="addMessage"
           />
         </button>
@@ -168,10 +167,11 @@ onMounted(() => {
       border: none
       cursor: pointer
       font-size: 30px
-      color: gray
       font-weight: bold
       margin-right: 20px
       margin-top: 20px
+      &:hover
+       color: #0650d0
 
   .content
     max-width: 100%
@@ -179,6 +179,7 @@ onMounted(() => {
     border-top: 1px solid gray
     border-bottom: 1px solid gray
     overflow: auto
+
 
     .log
       width: fit-content
@@ -206,9 +207,9 @@ onMounted(() => {
       height: fit-content
       margin: 0 10px
       border: none
-
-      img
-        width: 24px
-        cursor: pointer
-        margin-top: 27.3px
+      cursor: pointer
+      margin-top: 25px
+      .fa-paper-plane
+        &:hover
+         color: #0650d0
 </style>
