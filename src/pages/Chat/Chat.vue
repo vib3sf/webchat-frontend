@@ -56,6 +56,7 @@ async function addMessage() {
 }
 
 const fetchMessages = async () => {
+  console.log(1);
   const responce = await fetch("http://localhost:3000/messages");
   const data = await responce.json();
   messages.splice(0, messages.length, ...data);
@@ -79,10 +80,9 @@ onMounted(() => {
   };
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
+    console.log(data);
     if (data.type === "ping") return;
     if (data.type === "welcome") return;
-    if (data.type === "confirm_subscription") return;
-    console.log(data);
     messages.push(data.message);
   };
   fetchMessages();
@@ -114,6 +114,8 @@ onMounted(() => {
           :time="message.created_at"
           :userName="message.user_name"
           :message_id="message.id"
+          @editMessage="fetchMessages"
+          @deleteMessage="fetchMessages"
         />
       </div>
       <div class="typingarea">

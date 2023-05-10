@@ -1,6 +1,6 @@
 /* eslint-disable */
 <script lang="ts" setup>
-import { reactive, defineProps, ref } from "vue";
+import { reactive, defineProps, defineEmits, ref } from "vue";
 
 interface Props {
   userId: string;
@@ -17,6 +17,8 @@ interface User {
 }
 
 const props = defineProps<Props>();
+// eslint-disable-next-line
+const emit = defineEmits<{(e: "deleteMessage"), (e: "editMessage")}>()
 const hover = ref(true);
 const editing = ref(false);
 const updatedText = ref(" ");
@@ -46,6 +48,7 @@ async function updateMessage() {
     throw new Error("Ошибка при изменении сообщения");
   }
   const data = await response.json();
+  emit("editMessage");
   return data; // возвращаем обновленное сообщение из серверного ответа
 }
 async function deleteMessage() {
@@ -56,6 +59,7 @@ async function deleteMessage() {
     },
     body: JSON.stringify({ user_id: user.id }),
   });
+  emit("deleteMessage");
 }
 </script>
 
@@ -90,6 +94,17 @@ async function deleteMessage() {
 </template>
 
 <style lang="sass" scoped>
+.actions
+  cursor: pointer
+  width: fit-content
+  margin-left: auto
+  .fa-pen
+    &:hover
+      color: grey
+  .fa-trash
+    margin-left: 10px
+    &:hover
+      color: grey
 .other-message
   background-color: #F2F2F7
   width: fit-content
