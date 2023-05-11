@@ -7,12 +7,6 @@ import Message from "../../components/Message/Message.vue";
 import { removeSessionFromStorage } from "../../helpers/tokens";
 import { removeUserFromStorage } from "../../helpers/user";
 
-// interface User {
-//   _id: string;
-//   email: string;
-//   name: string;
-// }
-
 interface IMessage {
   id: string;
   user_id: string;
@@ -23,7 +17,6 @@ interface IMessage {
 
 const message = ref<string>("");
 const messages = reactive<Array<IMessage>>([]);
-//const users = ref<string>("");
 const log = ref<string>("");
 const block = ref<HTMLElement>(document.body);
 const roomId = "ChatRoom";
@@ -31,6 +24,7 @@ const roomId = "ChatRoom";
 function handleLogout() {
   removeSessionFromStorage();
   removeUserFromStorage();
+  ws.close();
 }
 
 function scrollDown() {
@@ -55,13 +49,15 @@ async function addMessage() {
   scrollDown();
 }
 
-const fetchMessages = async () => {
-  console.log(1);
-  const responce = await fetch("http://localhost:3000/messages");
-  const data = await responce.json();
-  messages.splice(0, messages.length, ...data);
+function fetchMessages(data) {
+  console.log(`Fetch: ${data}`);
+  data.data.forEach((message) => {
+    messages.push(message);
+  });
+  console.log(`Messages: ${messages}`);
+  //messages.splice(0, messages.length, ...data);
   scrollDown();
-};
+}
 
 const ws = new WebSocket("ws://localhost:3000/cable");
 
@@ -81,11 +77,14 @@ onMounted(() => {
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
     console.log(data);
-    if (data.type === "ping") return;
-    if (data.type === "welcome") return;
-    messages.push(data.message);
+    if (data.message.type === "create") messages.push(data.message);
+    if (
+      data.message.type == "connection" ||
+      data.message.type == "destroy" ||
+      data.message.type == "update"
+    )
+      fetchMessages(data.message);
   };
-  fetchMessages();
 });
 </script>
 
