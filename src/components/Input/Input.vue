@@ -9,9 +9,9 @@ interface Props {
   type: string;
 }
 
-const props = defineProps<Props>();
-const width = ref<string>(props.width);
-const height = ref<string>(props.height);
+const props = defineProps<Props>(); // определяем, какие данные компонент получает от родительского
+const width = ref<string>(props.width); // ref - создание реактивной переменной(т. е. она реагирует на изменения)
+const height = ref<string>(props.height); // $emit ниже нужен для передачи введенного в инпут значения родителю
 </script>
 
 <template>

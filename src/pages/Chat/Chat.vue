@@ -55,7 +55,6 @@ function fetchMessages(data) {
     messages.push(message);
   });
   console.log(`Messages: ${messages}`);
-  //messages.splice(0, messages.length, ...data);
   scrollDown();
 }
 
@@ -76,7 +75,6 @@ onMounted(() => {
   };
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    console.log(data);
     if (data.message.type === "create") messages.push(data.message);
     if (
       data.message.type == "connection" ||
@@ -94,7 +92,8 @@ onMounted(() => {
       <header class="header">
         <p class="users">{{ "add" }} users online</p>
         <Logo style="margin: 0"></Logo>
-        <router-link to="/login">
+        <!-- При клике на router-link переходим на определенный URL -->
+        <router-link to="/login"> 
           <button class="settings" @click="handleLogout">
             <font-awesome-icon
               icon="fa-solid fa-right-from-bracket"
@@ -105,6 +104,7 @@ onMounted(() => {
       </header>
       <div class="content" id="content" ref="block">
         <div class="log">{{ log }}</div>
+        <!-- : - данные в дочерный компонент, @ - события в дочерний компонент -->
         <Message
           v-for="(message, idx) in messages"
           :key="idx"
@@ -153,8 +153,8 @@ onMounted(() => {
     margin: 0 auto
     margin-bottom: 20px
     text-align: center
-    display: flex
-    justify-content: space-between
+    display: flex // чтобы дочерние элементы отображались в строку
+    justify-content: space-between // чтобы между дочерними элементами было равное расстояние
 
     .users
       font-weight: bold

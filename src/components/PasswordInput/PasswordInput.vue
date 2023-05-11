@@ -29,18 +29,6 @@ const height = ref<string>(props.height);
       icon="fa-solid fa-eye-slash"
     />
     <font-awesome-icon @click="isShowed = true" v-else icon="fa-solid fa-eye" />
-    <!-- <img
-      v-if="isShowed"
-      @click="isShowed = false"
-      src="../../../public/res/hide.png"
-      alt="eye"
-    /> -->
-    <!-- <img
-     @click="isShowed = true" 
-      v-else
-      src="../../../public/res/show.png"
-      alt="eye"
-    /> -->
   </div>
 </template>
 

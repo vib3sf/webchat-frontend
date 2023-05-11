@@ -1,9 +1,4 @@
-import axios, { AxiosHeaders } from "axios";
-import { getSessionFromStorage } from "../helpers/tokens";
-
-interface Headers {
-  Authorization?: string;
-}
+import axios from "axios";
 
 interface Data {
   user: User;
@@ -23,10 +18,12 @@ export interface Request {
 }
 
 const axiosInstance = axios.create({
+  // создание экземпляра axios(для HTTP запросов)
   baseURL: "http://localhost:3000",
 });
 
 export const request = async ({ method, url, data, params }: Request) => {
+  // создание экзмепляра запроса
   const options = {
     method,
     data,

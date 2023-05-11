@@ -1,4 +1,3 @@
-import { AxiosHeaders } from "axios";
 import { addSessionToStorage } from "../helpers/tokens";
 import { addUserToStorage } from "../helpers/user";
 import { request } from "./request";

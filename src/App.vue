@@ -3,7 +3,7 @@
 </template>
 
 <style lang="sass">
-body
+body // обнуление стилей
   margin: 0
   padding: 0
 </style>

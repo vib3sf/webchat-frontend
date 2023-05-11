@@ -18,11 +18,11 @@ interface User {
 
 const props = defineProps<Props>();
 // eslint-disable-next-line
-const emit = defineEmits<{(e: "deleteMessage"), (e: "editMessage")}>()
+const emit = defineEmits<{(e: "deleteMessage"), (e: "editMessage")}>() // определяем события из родительского компонента
 const hover = ref(true);
 const editing = ref(false);
 const updatedText = ref(" ");
-const user = reactive<User>(JSON.parse(localStorage.getItem("user") || "{}"));
+const user = reactive<User>(JSON.parse(localStorage.getItem("user") || "{}")); // reactive - тот же ref, только для объектов
 function checkMessage(): string {
   return props.userId === user.id ? "your-message" : "other-message";
 }
@@ -69,14 +69,18 @@ async function deleteMessage() {
     @mouseover="hover = true"
     @mouseleave="hover = false"
   >
+    <!-- Событие прио тведении и наведении мышки -->
     <div class="name" v-if="userId !== user.id">
       {{ userName }}
     </div>
+    <!-- {{}} - вставка переменной JS в верстку -->
+    <!-- v-if - при каком условии отрисуется элемент -->
     <div v-if="editing">
+      <!-- v-model - в какую перменную будут записываться данные из input -->
       <input v-model="updatedText" type="text" />
       <button @click="updateMessage">Применить</button>
     </div>
-    <p class="text" v-else>{{ text }}</p>
+    <p class="text">{{ text }}</p>
     <p class="time">
       <timeago :datetime="time"></timeago>
     </p>
@@ -86,9 +90,7 @@ async function deleteMessage() {
         v-if="!editing"
         @click="editMessage"
       />
-      <!-- <button v-if="!editing" @click="editMessage">edit</button> -->
       <font-awesome-icon icon="fa-solid fa-trash" @click="deleteMessage" />
-      <!-- <button @click="deleteMessage">delete</button> -->
     </div>
   </div>
 </template>
@@ -139,7 +141,7 @@ async function deleteMessage() {
   max-width: 400px
   height: fit-content
   color: #ffffff
-  border-radius: 15px 0 15px 15px
+  border-radius: 15px 0 15px 15px // лево-верх право-верх право-низ лево-низ
   padding: 5px
   margin-left: auto
   margin-right: 20px

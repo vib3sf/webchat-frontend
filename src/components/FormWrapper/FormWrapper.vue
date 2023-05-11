@@ -9,7 +9,7 @@
   max-width: 600px
   height: 500px
   background-color: #ffffff
-  border-radius: 15px
-  margin: 0 auto
-  box-sizing: border-box
+  border-radius: 15px // скругление границы
+  margin: 0 auto // центрирование по горизонтали
+  box-sizing: border-box // размеры элемента уже включают в себя padding и margin
 </style>
