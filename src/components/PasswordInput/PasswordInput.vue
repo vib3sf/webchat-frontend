@@ -23,6 +23,7 @@ const height = ref<string>(props.height);
       placeholder="Password"
       :type="!isShowed ? 'password' : 'text'"
     />
+    <!-- emit==> при вводе чего-либо в инпут вызывается функция v-model -->
     <font-awesome-icon
       v-if="isShowed"
       @click="isShowed = false"

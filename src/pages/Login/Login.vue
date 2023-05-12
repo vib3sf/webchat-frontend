@@ -53,7 +53,7 @@ async function handleLogin() {
         />
         <PasswordInput v-model="password" width="100%" height="40px" />
       </div>
-      <Button @click="handleLogin"> Sign up </Button>
+      <Button @click="handleLogin"> Sign in </Button>
       <p class="error">{{ error }}</p>
     </FormWrapper>
   </Wrapper>

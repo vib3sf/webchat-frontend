@@ -51,6 +51,7 @@ async function addMessage() {
 
 function fetchMessages(data) {
   console.log(`Fetch: ${data}`);
+  messages.length = 0;
   data.data.forEach((message) => {
     messages.push(message);
   });
@@ -75,7 +76,7 @@ onMounted(() => {
   };
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    if (data.message.type === "create") messages.push(data.message);
+    if (data.message.type === "create") messages.push(data.message.data);
     if (
       data.message.type == "connection" ||
       data.message.type == "destroy" ||
@@ -90,10 +91,9 @@ onMounted(() => {
   <Wrapper
     ><div class="chat">
       <header class="header">
-        <p class="users">{{ "add" }} users online</p>
         <Logo style="margin: 0"></Logo>
         <!-- При клике на router-link переходим на определенный URL -->
-        <router-link to="/login"> 
+        <router-link to="/login">
           <button class="settings" @click="handleLogout">
             <font-awesome-icon
               icon="fa-solid fa-right-from-bracket"

@@ -60,7 +60,7 @@ async function handleRegister() {
         </div>
       </div>
       <Button @click="handleRegister" @keydown.enter="handleRegister">
-        Sign in
+        Sign up
       </Button>
       <p class="error">{{ error }}</p>
     </FormWrapper>
