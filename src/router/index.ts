@@ -6,7 +6,7 @@ import { getSessionFromStorage } from "@/helpers/tokens";
 
 const routes = [
   {
-    path: "/login",
+    path: "/",
     name: "login",
     component: Login,
   },
