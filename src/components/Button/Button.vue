@@ -1,26 +1,28 @@
 <template>
-  <div class="button">
-    <button><slot></slot></button>
-  </div>
+  <button class="button">
+    <slot></slot>
+  </button>
 </template>
 
 <script lang="ts" setup></script>
 
-<style lang="sass" scoped>
-.button
-  max-width: 400px
-  margin: 0 auto
-  button
-    width: 100%
-    height: 40px
-    color: #ffffff
-    font-size: 24px
-    border-radius: 5px
-    background-color: #4796ff
-    border: none
-    cursor: pointer
-    transition: 0.2s linear
+<style lang="scss" scoped>
+.button {
+  max-width: 400px;
+  padding: 10px;
+  box-sizing: border-box;
+  display: block;
+  margin: 0 auto;
+  color: #ffffff;
+  font-size: 24px;
+  border-radius: 5px;
+  background-color: #4796ff;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s linear;
 
-    &:hover
-      border-radius: 15px
+  &:hover {
+    border-radius: 15px;
+  }
+}
 </style>

@@ -1,100 +1,13 @@
-<script lang="ts" setup>
-import { ref, reactive, onMounted } from "vue";
-import Wrapper from "../../components/Wrapper/Wrapper.vue";
-import Logo from "../../components/Logo/Logo.vue";
-import Input from "../../components/Input/Input.vue";
-import Message from "../../components/Message/Message.vue";
-import { removeSessionFromStorage } from "../../helpers/tokens";
-import { getUserFromStorage, removeUserFromStorage } from "../../helpers/user";
-import { io, Socket } from "socket.io-client";
-import { nanoid } from "nanoid";
-import { DefaultEventsMap } from "@socket.io/component-emitter";
-
-interface User {
-  _id: string;
-  email: string;
-  name: string;
-}
-
-interface IMessage {
-  messageId: string;
-  text: string;
-  roomId: string;
-  userId: string;
-  userName: string;
-  createdAt: string;
-}
-
-const user = reactive(JSON.parse(getUserFromStorage() || "{}"));
-const message = ref<string>("");
-const messages = reactive<Array<IMessage>>([]);
-const users = reactive<Array<User>>([]);
-const roomId = "famiChat";
-const log = ref<string>("");
-const block = ref<HTMLElement>(document.body);
-
-var socket: Socket<DefaultEventsMap, DefaultEventsMap>;
-
-function handleLogout() {
-  removeSessionFromStorage();
-  removeUserFromStorage();
-}
-
-function addMessage() {
-  socket.emit("message:add", {
-    roomId: roomId,
-    userName: user.name,
-    text: message.value,
-    userId: user._id,
-    messageId: nanoid(),
-  });
-  message.value = "";
-}
-
-onMounted(() => {
-  socket = io("http://localhost:5000", {
-    query: {
-      roomId: "famiChat",
-      userName: user?.name,
-    },
-  });
-  socket.emit("message:get");
-  socket.on("message-list:update", (msgs) => {
-    msgs.map((msg: IMessage) => messages.push(msg));
-    setTimeout(() => {
-      let div = block.value;
-      div.scrollTop = div.scrollHeight - div.clientHeight;
-    }, 1000);
-  });
-  socket.emit("user:add", user?.name);
-  socket.on("log", (l) => {
-    log.value = l;
-    setTimeout(() => {
-      log.value = "";
-    }, 2000);
-  });
-  socket.on("user-list:update", (us) => {
-    us.map((user: User) => users.push(user));
-  });
-  setTimeout(() => {
-    let div = block.value;
-    div.scrollTop = div.scrollHeight - div.clientHeight;
-  }, 1000);
-});
-</script>
-
 <template>
-  <Wrapper
-    ><div class="chat">
+  <Wrapper>
+    <div class="chat">
       <header class="header">
-        <p class="users">{{ users.length }} users online</p>
-        <Logo style="margin: 0"></Logo>
+        <Logo class="logo"></Logo>
         <router-link to="/login">
           <button class="settings" @click="handleLogout">
-            <img
-              src="../../../public/res/logout.png"
+            <font-awesome-icon
+              icon="fa-solid fa-right-from-bracket"
               class="logout"
-              alt="logout"
             />
           </button>
         </router-link>
@@ -104,106 +17,217 @@ onMounted(() => {
         <Message
           v-for="(message, idx) in messages"
           :key="idx"
-          :userId="message.userId"
-          :text="message.text"
-          :time="message.createdAt"
-          :userName="message.userName"
+          :message="message"
+          @editMessage="fetchMessages"
+          @deleteMessage="fetchMessages"
         />
       </div>
-      <div class="typingarea">
-        <div class="inp">
-          <Input
-            v-model="message"
-            type="text"
-            width="100%"
-            height="40px"
-            placeholder="Start typing"
-          />
-        </div>
+      <div class="typing-area">
+        <Input
+          v-model="message"
+          class="typing-area-input"
+          type="text"
+          placeholder="Start typing"
+        />
         <button class="send-button">
-          <img
-            src="../../../public/res/send.png"
-            alt="send"
+          <font-awesome-icon
+            icon="fa-solid fa-paper-plane"
+            size="2xl"
             @click.stop="addMessage"
           />
         </button>
-      </div></div
-  ></Wrapper>
+      </div>
+    </div>
+    <Transition name="fade">
+      <p v-if="error" class="error-window">{{ error }}</p>
+    </Transition>
+  </Wrapper>
 </template>
 
-<style lang="sass" scoped>
-.chat
-  max-width: 1000px
-  height: 600px
-  background-color: #ffffff
-  margin: 0 auto
-  border-radius: 15px
-  margin-top: 20px
+<script setup lang="ts">
+import { ref, reactive, onMounted } from "vue";
+import Wrapper from "@/components/Wrapper/Wrapper.vue";
+import Logo from "@/components/Logo/Logo.vue";
+import Input from "@/components/Input/Input.vue";
+import Message from "@/components/Message/Message.vue";
+import { removeSessionFromStorage } from "@/helpers/tokens";
+import { removeUserFromStorage } from "@/helpers/user";
+import router from "@/router";
 
-  .header
-    max-width: 100%
-    height: 50px
-    margin: 0 auto
-    margin-bottom: 20px
-    text-align: center
-    display: flex
-    justify-content: space-between
+export interface IMessage {
+  id: string;
+  user_id: string;
+  content: string;
+  user_name: string;
+  created_at: string;
+}
 
-    .users
-      font-weight: bold
-      margin-left: 20px
-      margin-top: 25px
+const ws = new WebSocket("ws://localhost:3000/cable");
+const roomId = "ChatRoom";
 
-    .settings
-      height: fit-content
-      background-color: #ffffff
-      outline: none
-      border: none
-      cursor: pointer
-      font-size: 30px
-      color: gray
-      font-weight: bold
-      margin-right: 20px
-      margin-top: 20px
+const message = ref<string>("");
+const messages = reactive<Array<IMessage>>([]);
+const log = ref<string>("");
+const block = ref<HTMLElement | null>(null);
+const error = ref<string>("");
 
-  .content
-    max-width: 100%
-    height: 450px
-    border-top: 1px solid gray
-    border-bottom: 1px solid gray
-    overflow: auto
-    -ms-overflow-style: none
-    scrollbar-width: none
+onMounted(() => {
+  ws.onopen = () => {
+    console.log("Connected to websocket");
+    ws.send(
+      JSON.stringify({
+        command: "subscribe",
+        identifier: JSON.stringify({
+          id: roomId,
+          channel: "MessagesChannel",
+        }),
+      })
+    );
+  };
+  ws.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    if (data.message.type === "create") {
+      messages.push(data.message.data);
+    }
+    if (
+      data.message.type == "connection" ||
+      data.message.type == "destroy" ||
+      data.message.type == "update"
+    ) {
+      fetchMessages(data.message.data);
+    }
+  };
+});
 
-    .log
-      width: fit-content
-      height: 50px
-      margin: 0 auto
-      margin-top: 10px
+function handleLogout(): void {
+  removeSessionFromStorage();
+  removeUserFromStorage();
+  ws.close();
+  router.push("/login");
+}
 
-  .content::-webkit-scrollbar
-    width: 0
-    height: 0
+function scrollDown(): void {
+  setTimeout(() => {
+    let div = block.value;
+    if (div) {
+      div.scrollTop = div.scrollHeight - div.clientHeight;
+    }
+  }, 300);
+}
 
-  .typingarea
-    max-width: 100%
-    height: 78.6px
-    display: flex
-    padding-left: 10px
+async function addMessage() {
+  const content = message.value;
+  const user_id = JSON.parse(localStorage.getItem("user") || "{}").id;
+  const user_name = JSON.parse(localStorage.getItem("user") || "{}").username;
+  try {
+    await fetch("http://localhost:3000/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_id, user_name, content }),
+    });
+    message.value = "";
+    scrollDown();
+  } catch (e) {
+    error.value = "Something went wrong. Please try again";
+    setTimeout(() => error.value = "", 3000);
+  }
 
-    .inp
-        width: 100%
-        margin-top: 19.3px
+}
 
-    .send-button
-      background-color: #ffffff
-      width: fit-content
-      height: fit-content
-      margin: 0 10px
-      border: none
+function fetchMessages(data: Array<IMessage>): void {
+  messages.length = 0;
+  data.forEach((message) => {
+    messages.push(message);
+  });
+  scrollDown();
+}
+</script>
 
-      img
-        width: 24px
-        cursor: pointer
-        margin-top: 27.3px
+<style lang="scss" scoped>
+.chat {
+  max-width: 1000px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  margin: 0 auto;
+  border-radius: 15px;
+
+  .header {
+    max-width: 100%;
+    height: 50px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .users {
+      font-weight: bold;
+    }
+
+    .settings {
+      height: fit-content;
+      background-color: #ffffff;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      font-size: 30px;
+      font-weight: bold;
+      &:hover {
+        color: #0650d0;
+      }
+    }
+  }
+
+  .content {
+    max-width: 100%;
+    height: 100%;
+    border-top: 1px solid gray;
+    border-bottom: 1px solid gray;
+    overflow: auto;
+
+    .log {
+      width: fit-content;
+      height: 50px;
+      margin: 0 auto;
+      margin-top: 10px;
+    }
+  }
+
+  .content::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  .typing-area {
+    max-width: 100%;
+    height: 78.6px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 0 15px;
+
+    .input {
+      width: 100%;
+      height: 40px;
+    }
+
+    .send-button {
+      background-color: #ffffff;
+      width: fit-content;
+      height: fit-content;
+      border: none;
+      cursor: pointer;
+
+      .fa-paper-plane {
+        &:hover {
+          color: #0650d0;
+        }
+      }
+    }
+  }
+}
 </style>
