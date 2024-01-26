@@ -3,16 +3,21 @@ import { addUserToStorage } from "../helpers/user";
 import { request } from "./request";
 
 export const login = async (name: string, password: string) => {
-  const user = { username: name, password: password };
-  const responce = await request({
+  const response = await request({
     url: "/login",
     method: "POST",
     data: {
-      user,
+      user: {
+        username: name,
+        password,
+      },
     },
   });
-  addSessionToStorage(responce.token);
-  addUserToStorage(JSON.stringify(responce.user));
+
+  addSessionToStorage(response.token);
+  addUserToStorage(JSON.stringify(response.user));
+
+  return response;
 };
 
 export const register = async (
@@ -20,17 +25,18 @@ export const register = async (
   password: string,
   confirmation_password: string
 ) => {
-  const user = {
-    username: name,
-    password: password,
-    password_confirmation: confirmation_password,
-  };
   await request({
     url: "/register",
     method: "POST",
     data: {
-      user,
+      user: {
+        username: name,
+        password,
+        confirmation_password,
+      },
     },
   });
-  login(name, password);
+  const response = await login(name, password);
+
+  return response;
 };

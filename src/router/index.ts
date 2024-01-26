@@ -29,9 +29,9 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // при переходе на каждый URL мы проверяем, имеем ли мы на это право
   const token: string | null = getSessionFromStorage();
-  const requireAuth: boolean = to.matched.some((record) => record.meta.auth); // some ищет что-то в массиве и возвращает true или false
+  const requireAuth: boolean = to.matched.some((record) => record.meta.auth);
+
   if (!token && requireAuth) {
     next("/login");
   } else if (token && !requireAuth) {

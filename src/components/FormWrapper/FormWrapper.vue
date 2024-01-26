@@ -1,15 +1,18 @@
 <template>
-  <div class="formwrapper"><slot></slot></div>
+  <div class="form-wrapper">
+    <slot></slot>
+  </div>
 </template>
 
 <script lang="ts" setup></script>
 
-<style lang="sass" scoped>
-.formwrapper
-  max-width: 600px
-  height: 500px
-  background-color: #ffffff
-  border-radius: 15px // скругление границы
-  margin: 0 auto // центрирование по горизонтали
-  box-sizing: border-box // размеры элемента уже включают в себя padding и margin
+<style lang="scss" scoped>
+.form-wrapper {
+  max-width: 600px;
+  height: 550px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  padding-top: 15px;
+  box-sizing: border-box;
+}
 </style>

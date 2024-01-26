@@ -1,44 +1,46 @@
+<template>
+  <input
+    class="input"
+    :value="props.modelValue"
+    :placeholder="props.placeholder"
+    :type="props.type"
+    @input="handleChangeInput"
+  />
+</template>
+
 <script lang="ts" setup>
-import { ref, defineProps } from "vue";
+import { defineProps, defineEmits } from "vue";
 
 interface Props {
-  width: string;
-  height: string;
   placeholder: string;
   modelValue: string;
   type: string;
 }
 
-const props = defineProps<Props>(); // определяем, какие данные компонент получает от родительского
-const width = ref<string>(props.width); // ref - создание реактивной переменной(т. е. она реагирует на изменения)
-const height = ref<string>(props.height); // $emit ниже нужен для передачи введенного в инпут значения родителю
+const props = defineProps<Props>();
+
+const emit = defineEmits(["update:modelValue"]);
+
+function handleChangeInput(event: Event):void {
+  emit('update:modelValue', (event.target as HTMLInputElement).value);
+}
 </script>
 
-<template>
-  <input
-    @input="
-      $emit('update:modelValue', ($event.target as HTMLInputElement).value)
-    "
-    :value="props.modelValue"
-    :placeholder="props.placeholder"
-    :type="props.type"
-  />
-</template>
+<style lang="scss" scoped>
+.input {
+  background-color: #f9f9f9;
+  border-radius: 15px;
+  outline: none;
+  border: none;
+  font-size: 20px;
+  padding-left: 10px;
+  box-sizing: border-box;
+  transition: 0.8s linear;
+  border: 1px solid lightblue;
 
-<style lang="sass" scoped>
-input
-  width: v-bind(width)
-  height: v-bind(height)
-  background-color: #f9f9f9
-  border-radius: 15px
-  outline: none
-  border: none
-  font-size: 20px
-  padding-left: 10px
-  box-sizing: border-box
-  transition: 0.8s linear
-
-  &:focus
-    border: 1px solid gray
-    background-color: #ffffff
+  &:focus {
+    border: 1px solid gray;
+    background-color: #ffffff;
+  }
+}
 </style>

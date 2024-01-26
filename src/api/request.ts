@@ -10,7 +10,7 @@ interface User {
   confirmation_password?: string;
 }
 
-export interface Request {
+interface Request {
   method: string;
   url: string;
   data: Data;
@@ -18,12 +18,10 @@ export interface Request {
 }
 
 const axiosInstance = axios.create({
-  // создание экземпляра axios(для HTTP запросов)
   baseURL: "http://localhost:3000",
 });
 
 export const request = async ({ method, url, data, params }: Request) => {
-  // создание экзмепляра запроса
   const options = {
     method,
     data,
