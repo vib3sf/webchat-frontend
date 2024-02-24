@@ -6,7 +6,7 @@ import { getSessionFromStorage } from "@/helpers/tokens";
 
 const routes = [
   {
-    path: "/",
+    path: "/login",
     name: "login",
     component: Login,
   },
@@ -16,7 +16,7 @@ const routes = [
     component: Registration,
   },
   {
-    path: "/chat",
+    path: "/",
     name: "chat",
     meta: { auth: true },
     component: Chat,
@@ -35,7 +35,7 @@ router.beforeEach((to, from, next) => {
   if (!token && requireAuth) {
     next("/login");
   } else if (token && !requireAuth) {
-    next("/chat");
+    next("/");
   } else {
     next();
   }

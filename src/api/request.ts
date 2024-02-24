@@ -1,7 +1,10 @@
 import axios from "axios";
 
 interface Data {
-  user: User;
+  user?: User;
+  user_id?: string;
+  user_name?: string;
+  content?: string;
 }
 
 interface User {

@@ -33,7 +33,7 @@
           <font-awesome-icon
             icon="fa-solid fa-paper-plane"
             size="2xl"
-            @click.stop="addMessage"
+            @click.stop="addNewMessage"
           />
         </button>
       </div>
@@ -45,14 +45,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import Wrapper from "@/components/Wrapper/Wrapper.vue";
 import Logo from "@/components/Logo/Logo.vue";
 import Input from "@/components/Input/Input.vue";
 import Message from "@/components/Message/Message.vue";
 import { removeSessionFromStorage } from "@/helpers/tokens";
-import { removeUserFromStorage } from "@/helpers/user";
+import { getUserFromStorage, removeUserFromStorage } from "@/helpers/user";
 import router from "@/router";
+import { addMessage } from "@/api/message";
 
 export interface IMessage {
   id: string;
@@ -66,7 +67,7 @@ const ws = new WebSocket("ws://localhost:3000/cable");
 const roomId = "ChatRoom";
 
 const message = ref<string>("");
-const messages = reactive<Array<IMessage>>([]);
+const messages = ref<Array<IMessage>>([]);
 const log = ref<string>("");
 const block = ref<HTMLElement | null>(null);
 const error = ref<string>("");
@@ -87,7 +88,7 @@ onMounted(() => {
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
     if (data.message.type === "create") {
-      messages.push(data.message.data);
+      messages.value.push(data.message.data);
     }
     if (
       data.message.type == "connection" ||
@@ -115,31 +116,22 @@ function scrollDown(): void {
   }, 300);
 }
 
-async function addMessage() {
-  const content = message.value;
-  const user_id = JSON.parse(localStorage.getItem("user") || "{}").id;
-  const user_name = JSON.parse(localStorage.getItem("user") || "{}").username;
+async function addNewMessage() {
+  const user = JSON.parse(getUserFromStorage());
   try {
-    await fetch("http://localhost:3000/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id, user_name, content }),
-    });
+    await addMessage(user.id, user.name, message.value);
     message.value = "";
     scrollDown();
   } catch (e) {
     error.value = "Something went wrong. Please try again";
     setTimeout(() => error.value = "", 3000);
   }
-
 }
 
 function fetchMessages(data: Array<IMessage>): void {
-  messages.length = 0;
+  messages.value.length = 0;
   data.forEach((message) => {
-    messages.push(message);
+    messages.value.push(message);
   });
   scrollDown();
 }

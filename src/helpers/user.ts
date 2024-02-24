@@ -1,4 +1,4 @@
-export const getUserFromStorage = () => localStorage.getItem("user");
+export const getUserFromStorage = () => localStorage.getItem("user") as string;
 
 export const removeUserFromStorage = () => localStorage.removeItem("user");
 

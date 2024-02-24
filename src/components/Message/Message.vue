@@ -9,7 +9,7 @@
     </div>
     <div v-if="editing" class="editing-block">
       <Input v-model="updatedText" placeholder="" type="text" />
-      <Button class="editing-block-button" @click="updateMessage">Accept</Button>
+      <Button class="editing-block-button" @click="updateExistingMessage">Accept</Button>
     </div>
     <p v-if="!editing" class="text">{{ message.content }}</p>
     <p class="time">
@@ -21,7 +21,7 @@
           icon="fa-solid fa-pen"
           @click="editMessage"
         />
-        <font-awesome-icon icon="fa-solid fa-trash" @click="deleteMessage" />
+        <font-awesome-icon icon="fa-solid fa-trash" @click="deleteExistingMessage" />
         <p
           v-if="editing"
           class="xmark"
@@ -40,8 +40,10 @@
 <script lang="ts" setup>
 import { ref, reactive, computed, defineProps, defineEmits } from "vue";
 import { IMessage } from "@/pages/Chat/Chat.vue";
-import Input from "../Input/Input.vue";
-import Button from "../Button/Button.vue";
+import Input from "@/components/Input/Input.vue";
+import Button from "@/components/Button/Button.vue";
+import { updateMessage, deleteMessage } from "@/api/message";
+import { getUserFromStorage } from "@/helpers/user";
 
 interface Props {
   message: IMessage
@@ -61,7 +63,7 @@ const hover = ref<boolean>(true);
 const editing = ref<boolean>(false);
 const updatedText = ref<string>("");
 const error = ref<string>("");
-const user = reactive<User>(JSON.parse(localStorage.getItem("user") as string));
+const user = reactive<User>(JSON.parse(getUserFromStorage()));
 
 const checkMessage = computed<string>(() => {
   return props.message.user_id === user.id ? "your-message" : "other-message";
@@ -72,21 +74,9 @@ function editMessage() {
   updatedText.value = props.message.content;
 }
 
-async function updateMessage() {
+async function updateExistingMessage() {
   try {
-    const response = await fetch(
-      `http://localhost:3000/messages/${props.message.id}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: user.id,
-          content: updatedText.value,
-        }),
-      }
-    );
+    const response = await updateMessage(props.message.id, user.id, updatedText.value);
     const data = await response.json();
     emit("editMessage");
     return data;
@@ -96,15 +86,9 @@ async function updateMessage() {
   }
 }
 
-async function deleteMessage() {
+async function deleteExistingMessage() {
   try {
-    await fetch(`http://localhost:3000/messages/${props.message.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id: user.id }),
-    });
+    await deleteMessage(props.message.id, user.id);
     emit("deleteMessage");
   } catch (e) {
     error.value = "Something went wrong!";

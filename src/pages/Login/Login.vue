@@ -47,7 +47,7 @@ const name = ref<string>("");
 const password = ref<string>("");
 const error = ref<string>("");
 
-async function handleLogin():Promise<void> {
+async function handleLogin(): Promise<void> {
   try {
     await login(name.value, password.value);
     router.push({ name: "chat" });
