@@ -9,16 +9,29 @@ npm install
 ```
 npm run serve
 ```
+## API routes:
 
-### Compiles and minifies for production
-```
-npm run build
-```
+login: POST http://localhost:3000/login
 
-### Lints and fixes files
-```
-npm run lint
-```
+формат данных: { "user": { "username": "ked1", "password": "123456" } }
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+register: POST http://localhost:3000/register
+
+формат данных: { "user": { "username": "ked1", "password": "123456",
+"password_confirmation": "12345" } }
+
+logout: DELETE http://localhost:3000/logout
+
+формат данных: { "user_id": "2" }
+
+create message: POST http://localhost:3000/messages
+
+формат данных: { "user_id": "1", "content": "text" }
+
+destroy message: DELETE http://localhost:3000/messages/id
+
+формат данных: { "user_id": "1", }
+
+edit message: PATCH http://localhost:3000/messages/id
+
+формат данных: { "user_id": "2", "content": "text1" }
