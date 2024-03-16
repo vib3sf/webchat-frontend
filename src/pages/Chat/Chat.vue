@@ -45,7 +45,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import Wrapper from "@/components/Wrapper/Wrapper.vue";
 import Logo from "@/components/Logo/Logo.vue";
 import Input from "@/components/Input/Input.vue";
@@ -63,51 +62,47 @@ export interface IMessage {
   created_at: string;
 }
 
-const ws = new WebSocket("ws://localhost:3000/cable");
-const roomId = "ChatRoom";
+import { ref, onMounted } from "vue";
+import { io } from "socket.io-client";
 
-const message = ref<string>("");
-const messages = ref<Array<IMessage>>([]);
-const log = ref<string>("");
-const block = ref<HTMLElement | null>(null);
-const error = ref<string>("");
+const socket = io("http://localhost:3000");
+
+const roomId = "ChatRoom";
+const message = ref("");
+const messages = ref([]);
+const log = ref("");
+const block = ref(null);
+const error = ref("");
 
 onMounted(() => {
-  ws.onopen = () => {
-    console.log("Connected to websocket");
-    ws.send(
-      JSON.stringify({
-        command: "subscribe",
-        identifier: JSON.stringify({
-          id: roomId,
-          channel: "MessagesChannel",
-        }),
-      })
-    );
-  };
-  ws.onmessage = (e) => {
-    const data = JSON.parse(e.data);
+  socket.on("connect", () => {
+    console.log("Connected to socket.io");
+    socket.emit("subscribe", {
+      id: roomId,
+      channel: "MessagesChannel",
+    });
+  });
+
+  socket.on("onMessage", (data) => {
+    console.log("RECV");
+    console.log(data.message.type);
     if (data.message.type === "create") {
       messages.value.push(data.message.data);
     }
-    if (
-      data.message.type == "connection" ||
-      data.message.type == "destroy" ||
-      data.message.type == "update"
-    ) {
+    if (data.message.type === "connection" || data.message.type === "destroy" || data.message.type === "update") {
       fetchMessages(data.message.data);
     }
-  };
+  });
 });
 
-function handleLogout(): void {
+function handleLogout() {
   removeSessionFromStorage();
   removeUserFromStorage();
-  ws.close();
+  socket.close();
   router.push("/login");
 }
 
-function scrollDown(): void {
+function scrollDown() {
   setTimeout(() => {
     let div = block.value;
     if (div) {
@@ -128,7 +123,7 @@ async function addNewMessage() {
   }
 }
 
-function fetchMessages(data: Array<IMessage>): void {
+function fetchMessages(data) {
   messages.value.length = 0;
   data.forEach((message) => {
     messages.value.push(message);

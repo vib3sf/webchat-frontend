@@ -1,3 +1,4 @@
+import { getSessionFromStorage } from "@/helpers/tokens";
 import axios from "axios";
 
 interface Data {
@@ -32,6 +33,12 @@ export const request = async ({ method, url, data, params }: Request) => {
     url,
   };
 
+  axiosInstance.interceptors.request.use((config) => {
+    config.headers.Authorization = `Bearer ${getSessionFromStorage()}`;
+    return config;
+  });
+
+  axios.get(url);
   const result = await axiosInstance(options);
   return result.data;
 };
