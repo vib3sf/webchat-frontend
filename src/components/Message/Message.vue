@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, defineProps, defineEmits } from "vue";
+import { ref, reactive, computed, defineProps } from "vue";
 import { IMessage } from "@/pages/Chat/Chat.vue";
 import Input from "@/components/Input/Input.vue";
 import Button from "@/components/Button/Button.vue";
@@ -57,8 +57,6 @@ interface User {
 
 const props = defineProps<Props>();
 
-const emit = defineEmits(["deleteMessage", "editMessage"]);
-
 const hover = ref<boolean>(true);
 const editing = ref<boolean>(false);
 const updatedText = ref<string>("");
@@ -76,10 +74,7 @@ function editMessage() {
 
 async function updateExistingMessage() {
   try {
-    const response = await updateMessage(props.message.id, user.id, updatedText.value);
-    const data = await response.json();
-    emit("editMessage");
-    return data;
+    await updateMessage(props.message.id, user.id, updatedText.value);
   } catch (e) {
     error.value = "Something went wrong!";
     setTimeout(() => error.value = "", 3000);
@@ -89,7 +84,6 @@ async function updateExistingMessage() {
 async function deleteExistingMessage() {
   try {
     await deleteMessage(props.message.id, user.id);
-    emit("deleteMessage");
   } catch (e) {
     error.value = "Something went wrong!";
     setTimeout(() => error.value = "", 3000);

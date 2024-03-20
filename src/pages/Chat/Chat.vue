@@ -77,7 +77,7 @@ const error = ref("");
 onMounted(() => {
   socket.on("connect", () => {
     console.log("Connected to socket.io");
-    socket.emit("subscribe", {
+    socket.emit("Connection", {
       id: roomId,
       channel: "MessagesChannel",
     });
@@ -85,13 +85,18 @@ onMounted(() => {
 
   socket.on("onMessage", (data) => {
     console.log("RECV");
-    console.log(data.message.type);
+    console.log(data);
     if (data.message.type === "create") {
       messages.value.push(data.message.data);
     }
-    if (data.message.type === "connection" || data.message.type === "destroy" || data.message.type === "update") {
+    if (
+      data.message.type === "connection" ||
+      data.message.type === "destroy" ||
+      data.message.type === "update"
+    ) {
       fetchMessages(data.message.data);
     }
+    console.log("end");
   });
 });
 
@@ -114,20 +119,24 @@ function scrollDown() {
 async function addNewMessage() {
   const user = JSON.parse(getUserFromStorage());
   try {
+    console.log(message.value);
     await addMessage(user.id, user.name, message.value);
     message.value = "";
     scrollDown();
+    console.log("scroll");
   } catch (e) {
     error.value = "Something went wrong. Please try again";
-    setTimeout(() => error.value = "", 3000);
+    setTimeout(() => (error.value = ""), 3000);
   }
 }
 
 function fetchMessages(data) {
   messages.value.length = 0;
+  console.log('fetch');
   data.forEach((message) => {
     messages.value.push(message);
   });
+  console.log(messages.value);
   scrollDown();
 }
 </script>
